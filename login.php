@@ -1,12 +1,13 @@
 <?php
-// login.php
-include 'config.php'; // Inclure le fichier de configuration
-include 'db.php'; // Inclure le fichier de connexion à la base de données
+session_start(); // Assurez-vous d'inclure session_start() ici
 
-$error = ''; // Initialiser la variable d'erreur
+include 'config.php'; 
+include 'db.php';
+
+$error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_POST['motdepasse'])) {
-    $email = $_POST['email'];
+    $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
     $motDePasse = $_POST['motdepasse'];
 
     // Requête SQL pour vérifier les informations d'identification
@@ -18,24 +19,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_PO
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
         if (password_verify($motDePasse, $user['MotDePasse'])) {
-            // Mot de passe correct, connexion réussie
-            $_SESSION['user_id'] = $user['NoUtilisateur']; // Enregistrer l'ID de l'utilisateur dans la session
-            
-            // Enregistrer la connexion dans la table connexions
+            $_SESSION['user_id'] = $user['NoUtilisateur'];
+
+            // Enregistrement de la connexion
             $noUtilisateur = $user['NoUtilisateur'];
-            $dateConnexion = date('Y-m-d H:i:s'); // Date et heure actuelles
+            $dateConnexion = date('Y-m-d H:i:s');
             $insertQuery = "INSERT INTO connexions (NoUtilisateur, Connexion) VALUES (?, ?)";
             $insertStmt = $conn->prepare($insertQuery);
             $insertStmt->bind_param("is", $noUtilisateur, $dateConnexion);
             $insertStmt->execute();
 
-            header("Location: dashboard.php"); // Rediriger vers le tableau de bord
+            header("Location: dashboard.php");
             exit();
         } else {
-            $error = "Identifiants incorrects."; // Message d'erreur
+            $error = "Mot de passe incorrect."; 
         }
     } else {
-        $error = "Identifiants incorrects."; // Message d'erreur
+        $error = "Adresse courriel non trouvée."; 
     }
 }
 ?>
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_PO
 </head>
 <body>
     <h1>Connexion</h1>
-    <?php if ($error) echo "<p style='color: red;'>$error</p>"; ?> <!-- Afficher le message d'erreur -->
+    <?php if ($error) echo "<p style='color: red;'>$error</p>"; ?>
     <form method="POST" action="">
         <label for="email">Courriel :</label>
         <input type="email" id="email" name="email" required>

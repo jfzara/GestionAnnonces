@@ -1,9 +1,10 @@
 <?php
-// dashboard.php
-include 'config.php'; // Inclure le fichier de configuration
+session_start(); // Assurez-vous d'inclure session_start() ici
 
-if (!isset($_SESSION['user_id'])) { // Vérifier si l'utilisateur est connecté
-    header("Location: login.php"); // Rediriger vers la page de connexion si non connecté
+include 'config.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
     exit();
 }
 ?>
@@ -17,7 +18,7 @@ if (!isset($_SESSION['user_id'])) { // Vérifier si l'utilisateur est connecté
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
-    <h1>Bienvenue sur le tableau de bord</h1>
-    <p><a href="logout.php">Se déconnecter</a></p> <!-- Lien pour se déconnecter -->
+    <h1>Bienvenue sur votre tableau de bord</h1>
+    <p><a href="logout.php">Se déconnecter</a></p>
 </body>
 </html>
