@@ -2,7 +2,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require 'vendor/autoload.php'; // Assurez-vous que ce chemin est correct
+require 'vendor/autoload.php';  
 
 session_start(); // Démarrer la session au début
 
@@ -17,6 +17,7 @@ try {
 include('config.php'); // Inclure le fichier de configuration pour la connexion à la base de données
 
 const ERROR_EMAIL_USED = "Cette adresse courriel est déjà utilisée.";
+const ERROR_PASSWORD_MISMATCH = "Les mots de passe ne correspondent pas.";
 const ERROR_REGISTRATION = "Erreur lors de l'enregistrement.";
 const SUCCESS_REGISTRATION = "Enregistrement réussi. Veuillez vérifier votre courriel pour confirmer votre inscription.";
 
@@ -24,8 +25,16 @@ const SUCCESS_REGISTRATION = "Enregistrement réussi. Veuillez vérifier votre c
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $courriel = filter_var(trim($_POST['courriel']), FILTER_SANITIZE_EMAIL);
     $mot_de_passe = $_POST['password1'];
+    $mot_de_passe_confirmation = $_POST['password2']; // Champ de confirmation
     $nom = trim($_POST['nom']);
     $prenom = trim($_POST['prenom']);
+
+    // Vérifiez si les mots de passe correspondent
+    if ($mot_de_passe !== $mot_de_passe_confirmation) {
+        $_SESSION['error'] = ERROR_PASSWORD_MISMATCH;
+        header('Location: enregistrement.php');
+        exit();
+    }
 
     // Vérification de l'existence de l'email
     $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE Courriel = ?");
@@ -116,6 +125,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <label for="password1">Mot de passe :</label>
         <input type="password" name="password1" id="password1" required>
+        <br>
+        <label for="password2">Confirmer le mot de passe :</label>
+        <input type="password" name="password2" id="password2" required>
         <br>
         <label for="nom">Nom :</label>
         <input type="text" name="nom" id="nom" required value="<?php echo isset($_POST['nom']) ? htmlspecialchars($_POST['nom']) : ''; ?>">

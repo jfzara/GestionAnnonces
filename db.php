@@ -1,9 +1,9 @@
 <?php
 // db.php
-$servername = "localhost"; // Votre serveur de base de données
-$username = "root"; // Votre nom d'utilisateur pour la base de données
-$password = ""; // Votre mot de passe pour la base de données
-$dbname = "gestionannonces"; // Remplacez par le nom de votre base de données
+$servername = "localhost";  
+$username = "root";  
+$password = "";  
+$dbname = "gestionannonces";  
 
 // Créer la connexion
 $conn = new mysqli($servername, $username, $password, $dbname);

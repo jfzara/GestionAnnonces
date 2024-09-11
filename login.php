@@ -23,26 +23,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer les données du formulaire
     $courriel = trim($_POST['courriel']);
     $mot_de_passe = $_POST['mot_de_passe'];
+    $confirmation_mot_de_passe = $_POST['confirmation_mot_de_passe']; // Nouveau champ
 
-    // Vérifier si l'utilisateur existe dans la base de données
-    $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE Courriel = ?");
-    $stmt->bind_param("s", $courriel);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-
-        // Vérifier le mot de passe
-        if (password_verify($mot_de_passe, $user['MotDePasse'])) {
-            $_SESSION['user_id'] = $user['ID']; // Enregistrer l'ID de l'utilisateur dans la session
-            header('Location: dashboard.php'); // Rediriger vers le tableau de bord
-            exit();
-        } else {
-            $_SESSION['error'] = "Mot de passe incorrect.";
-        }
+    // Vérification si les mots de passe correspondent
+    if ($mot_de_passe !== $confirmation_mot_de_passe) {
+        $_SESSION['error'] = "Les mots de passe ne correspondent pas.";
     } else {
-        $_SESSION['error'] = "Aucun utilisateur trouvé avec cet e-mail.";
+        // Vérifier si l'utilisateur existe dans la base de données
+        $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE Courriel = ?");
+        $stmt->bind_param("s", $courriel);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+
+            // Vérifier le mot de passe
+            if (password_verify($mot_de_passe, $user['MotDePasse'])) {
+                $_SESSION['user_id'] = $user['ID']; // Enregistrer l'ID de l'utilisateur dans la session
+                header('Location: dashboard.php'); // Rediriger vers le tableau de bord
+                exit();
+            } else {
+                $_SESSION['error'] = "Mot de passe incorrect.";
+            }
+        } else {
+            $_SESSION['error'] = "Aucun utilisateur trouvé avec cet e-mail.";
+        }
     }
 }
 
@@ -72,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <label for="mot_de_passe">Mot de passe :</label>
         <input type="password" name="mot_de_passe" id="mot_de_passe" required>
+        <br>
+        <label for="confirmation_mot_de_passe">Confirmer le mot de passe :</label>
+        <input type="password" name="confirmation_mot_de_passe" id="confirmation_mot_de_passe" required>
         <br>
         <input type="submit" value="Se connecter">
     </form>

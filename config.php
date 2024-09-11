@@ -1,13 +1,13 @@
 <?php
 // config.php
 
-define('SITE_NAME', 'Gestion Annonces'); // Définir le nom du site
+define('SITE_NAME', 'Gestion Annonces'); 
 
 // Paramètres de connexion à la base de données
-$servername = "localhost"; // généralement localhost
-$username = "root"; // Remplacez par votre nom d'utilisateur de base de données
-$password = ""; // Remplacez par votre mot de passe de base de données
-$dbname = "gestionannonces"; // Remplacez par le nom de votre base de données
+$servername = "localhost"; 
+$username = "root"; 
+$password = ""; 
+$dbname = "gestionannonces"; 
 
 // Création de la connexion
 $conn = new mysqli($servername, $username, $password, $dbname);

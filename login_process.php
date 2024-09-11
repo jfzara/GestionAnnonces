@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
 
-    // Vérifiez l'utilisateur dans la base de données
+    // Vérifier l'utilisateur dans la base de données
     $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE Courriel = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -14,9 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
-        // Vérifiez le mot de passe
+        // Vérifier le mot de passe
         if (password_verify($password, $user['MotDePasse'])) {
-            // Vérifiez si l'utilisateur est confirmé
+            // Vérifier si l'utilisateur est confirmé
             if ($user['Statut'] === '1') {
                 $_SESSION['user_id'] = $user['id']; // Assurez-vous que 'id' est la colonne de l'identifiant
                 header('Location: dashboard.php'); // Rediriger vers le tableau de bord
