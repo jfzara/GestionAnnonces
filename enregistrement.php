@@ -1,4 +1,4 @@
-<?php
+<?php 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -6,6 +6,7 @@ require 'vendor/autoload.php'; // Assurez-vous que ce chemin est correct
 
 session_start(); // Démarrer la session au début
 
+// Charger les variables d'environnement à partir du fichier .env
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 try {
     $dotenv->load();
@@ -13,12 +14,15 @@ try {
     die("Le fichier .env est introuvable ou ne peut pas être lu : " . $e->getMessage());
 }
 
-include('config.php');
+include('config.php'); // Inclure le fichier de configuration pour la connexion à la base de données
+
+const ERROR_EMAIL_USED = "Cette adresse courriel est déjà utilisée.";
+const ERROR_REGISTRATION = "Erreur lors de l'enregistrement.";
+const SUCCESS_REGISTRATION = "Enregistrement réussi. Veuillez vérifier votre courriel pour confirmer votre inscription.";
 
 // Vérifiez si la méthode de la requête est POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Récupération des données de formulaire
-    $courriel = trim($_POST['courriel']); // Récupérez l'e-mail de l'utilisateur
+    $courriel = filter_var(trim($_POST['courriel']), FILTER_SANITIZE_EMAIL);
     $mot_de_passe = $_POST['password1'];
     $nom = trim($_POST['nom']);
     $prenom = trim($_POST['prenom']);
@@ -29,11 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     $result = $stmt->get_result();
 
+    // Si l'email est déjà utilisé
     if ($result->num_rows > 0) {
-        $_SESSION['error'] = "Cette adresse courriel est déjà utilisée.";
+        $_SESSION['error'] = ERROR_EMAIL_USED;
         header('Location: enregistrement.php');
         exit();
     } else {
+        // Hachage du mot de passe et génération d'un token
         $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
         $token = bin2hex(random_bytes(16));
 
@@ -42,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("sssss", $courriel, $hashed_password, $nom, $prenom, $token);
         
         if ($stmt->execute()) {
-            // Envoi du courriel de confirmation avec PHP Mailer
+            // Envoi du courriel de confirmation à l'utilisateur
             $mail = new PHPMailer(true);
             try {
                 // Configuration du serveur SMTP
@@ -50,22 +56,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mail->Host       = $_ENV['SMTP_HOST'];  
                 $mail->SMTPAuth   = true;
                 $mail->Username   = $_ENV['SMTP_USERNAME']; 
-                $mail->Password   = 'bxra mwqx rqfy osmm'; 
+                $mail->Password   = $_ENV['SMTP_PASSWORD'];
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
 
                 // Destinataire et contenu
-                $mail->setFrom($_ENV['SMTP_USERNAME'], 'Gestion Annonces');
-                $mail->addAddress($courriel);
+                $mail->setFrom('zarajeanfabrice@gmail.com', 'Gestion Annonces');
+                $mail->addAddress($courriel); // Envoi au nouvel utilisateur
 
-                // Contenu du message
+                // Contenu du message de confirmation à l'utilisateur
                 $mail->isHTML(true);
                 $mail->Subject = 'Confirmation de votre inscription';
                 $mail->Body    = "Bonjour $nom $prenom,<br><br>Merci pour votre inscription ! Veuillez confirmer votre adresse courriel en cliquant sur le lien suivant :<br><br>
                 <a href='http://localhost/GestionAnnonces/confirmation.php?token=$token'>Confirmer votre compte</a><br><br>Si vous n'avez pas créé ce compte, ignorez ce courriel.";
-
+                
                 $mail->send();
-                $_SESSION['success'] = "Enregistrement réussi. Veuillez vérifier votre courriel pour confirmer votre inscription.";
+
+                // Redirection avec succès
+                $_SESSION['success'] = SUCCESS_REGISTRATION;
                 header('Location: login.php?message=Vérifiez votre courriel pour confirmer votre compte');
                 exit();
             } catch (Exception $e) {
@@ -74,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
             }
         } else {
-            $_SESSION['error'] = "Erreur lors de l'enregistrement.";
+            $_SESSION['error'] = ERROR_REGISTRATION;
             header('Location: enregistrement.php');
             exit();
         }
@@ -93,13 +101,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1>Inscription</h1>
 
     <?php
-    if (isset($_SESSION['error'])) {
-        echo "<p style='color:red;'>".$_SESSION['error']."</p>";
-        unset($_SESSION['error']);
-    }
-    if (isset($_SESSION['success'])) {
-        echo "<p style='color:green;'>".$_SESSION['success']."</p>";
-        unset($_SESSION['success']);
+    // Affichage des messages d'erreur ou de succès
+    foreach (['error', 'success'] as $msg) {
+        if (isset($_SESSION[$msg])) {
+            echo "<p style='color:".($msg === 'error' ? 'red' : 'green').";'>".$_SESSION[$msg]."</p>";
+            unset($_SESSION[$msg]);
+        }
     }
     ?>
 

@@ -1,28 +1,36 @@
 <?php
 session_start();
-include('config.php');
+include('config.php'); // Inclure la configuration de la base de données
 
-$token = $_GET['token'];
+if (isset($_GET['token'])) {
+    $token = $_GET['token'];
 
-if ($token) {
-    $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE Token = ? AND Statut = 0");
+    // Vérifier si le token existe dans la base de données
+    $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE Token = ?");
     $stmt->bind_param("s", $token);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // Mise à jour du statut de l'utilisateur
-        $updateStmt = $conn->prepare("UPDATE utilisateurs SET Statut = 1, Token = NULL WHERE Token = ?");
-        $updateStmt->bind_param("s", $token);
-        $updateStmt->execute();
-        $_SESSION['success'] = "Votre compte a été confirmé. Vous pouvez maintenant vous connecter.";
-        header('Location: login.php');
+        // Mettre à jour le statut de l'utilisateur
+        $stmt = $conn->prepare("UPDATE utilisateurs SET Statut = 1 WHERE Token = ?");
+        $stmt->bind_param("s", $token);
+        if ($stmt->execute()) {
+            $_SESSION['success'] = "Votre compte a été confirmé avec succès.";
+        } else {
+            $_SESSION['error'] = "Erreur lors de la confirmation de votre compte.";
+        }
     } else {
-        $_SESSION['error'] = "Lien de confirmation invalide ou déjà utilisé.";
-        header('Location: enregistrement.php');
+        $_SESSION['error'] = "Token invalide ou déjà utilisé.";
     }
 } else {
-    $_SESSION['error'] = "Aucun token trouvé.";
-    header('Location: enregistrement.php');
+    $_SESSION['error'] = "Aucun token fourni.";
 }
+
+$stmt->close();
+$conn->close();
+
+// Redirection vers la page de connexion
+header('Location: login.php');
+exit();
 ?>

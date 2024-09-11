@@ -1,64 +1,81 @@
 <?php
-session_start(); // Assurez-vous d'inclure session_start() ici
 
-include 'config.php'; 
-include 'db.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+session_start();
 
-$error = '';
+// Inclure le fichier de configuration pour la connexion à la base de données
+include('config.php');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_POST['motdepasse'])) {
-    $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
-    $motDePasse = $_POST['motdepasse'];
+// Fonction pour vérifier si l'utilisateur est authentifié
+function checkAuth() {
+    if (isset($_SESSION['user_id'])) {
+        header("Location: dashboard.php"); // Rediriger vers le tableau de bord si déjà connecté
+        exit();
+    }
+}
 
-    // Requête SQL pour vérifier les informations d'identification
+// Appeler la fonction pour vérifier l'authentification
+checkAuth();
+
+// Gérer la connexion
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Récupérer les données du formulaire
+    $courriel = trim($_POST['courriel']);
+    $mot_de_passe = $_POST['mot_de_passe'];
+
+    // Vérifier si l'utilisateur existe dans la base de données
     $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE Courriel = ?");
-    $stmt->bind_param("s", $email);
+    $stmt->bind_param("s", $courriel);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
-        if (password_verify($motDePasse, $user['MotDePasse'])) {
-            $_SESSION['user_id'] = $user['NoUtilisateur'];
 
-            // Enregistrement de la connexion
-            $noUtilisateur = $user['NoUtilisateur'];
-            $dateConnexion = date('Y-m-d H:i:s');
-            $insertQuery = "INSERT INTO connexions (NoUtilisateur, Connexion) VALUES (?, ?)";
-            $insertStmt = $conn->prepare($insertQuery);
-            $insertStmt->bind_param("is", $noUtilisateur, $dateConnexion);
-            $insertStmt->execute();
-
-            header("Location: dashboard.php");
+        // Vérifier le mot de passe
+        if (password_verify($mot_de_passe, $user['MotDePasse'])) {
+            $_SESSION['user_id'] = $user['ID']; // Enregistrer l'ID de l'utilisateur dans la session
+            header('Location: dashboard.php'); // Rediriger vers le tableau de bord
             exit();
         } else {
-            $error = "Mot de passe incorrect."; 
+            $_SESSION['error'] = "Mot de passe incorrect.";
         }
     } else {
-        $error = "Adresse courriel non trouvée."; 
+        $_SESSION['error'] = "Aucun utilisateur trouvé avec cet e-mail.";
     }
 }
+
+// Affichage des messages d'erreur
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo SITE_NAME; ?> - Connexion</title>
-    <link rel="stylesheet" href="styles/style.css">
+    <title>Connexion</title>
 </head>
 <body>
     <h1>Connexion</h1>
-    <?php if ($error) echo "<p style='color: red;'>$error</p>"; ?>
-    <form method="POST" action="">
-        <label for="email">Courriel :</label>
-        <input type="email" id="email" name="email" required>
-        
-        <label for="motdepasse">Mot de passe :</label>
-        <input type="password" id="motdepasse" name="motdepasse" required>
-        
-        <button type="submit">Se connecter</button>
+
+    <?php
+    // Affichage des messages d'erreur ou de succès
+    if (isset($_SESSION['error'])) {
+        echo "<p style='color:red;'>".$_SESSION['error']."</p>";
+        unset($_SESSION['error']);
+    }
+    ?>
+
+    <form action="login.php" method="POST">
+        <label for="courriel">Courriel :</label>
+        <input type="email" name="courriel" id="courriel" required>
+        <br>
+        <label for="mot_de_passe">Mot de passe :</label>
+        <input type="password" name="mot_de_passe" id="mot_de_passe" required>
+        <br>
+        <input type="submit" value="Se connecter">
     </form>
+
+    <p><a href="enregistrement.php">Créer un compte</a></p>
 </body>
 </html>
