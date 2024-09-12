@@ -19,6 +19,21 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 <body>
     <h1>Bienvenue sur votre tableau de bord</h1>
-    <p><a href="logout.php">Se déconnecter</a></p>
+
+    <!-- Menu principal -->
+    <nav>
+        <ul>
+            <li><a href="annonces.php">Afficher les annonces</a></li>
+            <li><a href="gestion_annonces.php">Gérer les annonces</a></li>
+            <li><a href="modification_profil.php">Modifier le profil</a></li>
+            <li><a href="logout.php">Se déconnecter</a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenu par défaut : Affichage de toutes les annonces -->
+    <section id="content">
+        <h2>Liste des annonces</h2>
+        <!-- Ici tu peux inclure le code pour afficher les annonces -->
+    </section>
 </body>
 </html>
