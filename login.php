@@ -45,7 +45,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param("i", $user['NoUtilisateur']);
                 $stmt->execute();
 
-                $_SESSION['user_id'] = $user['ID']; // Enregistrer l'ID de l'utilisateur dans la session
+                // Enregistrer la connexion dans la table connexions
+                $stmt = $conn->prepare("INSERT INTO connexions (NoUtilisateur) VALUES (?)");
+                $stmt->bind_param("i", $user['NoUtilisateur']);
+                $stmt->execute();
+
+                // Récupérer l'ID de la connexion pour l'utiliser lors de la déconnexion
+                $NoConnexion = $conn->insert_id;
+                $_SESSION['NoConnexion'] = $NoConnexion; // Stocker l'ID de la connexion dans la session
+
+                // Enregistrer l'ID de l'utilisateur dans la session
+                $_SESSION['user_id'] = $user['NoUtilisateur'];
                 header('Location: dashboard.php'); // Rediriger vers le tableau de bord
                 exit();
             } else {
