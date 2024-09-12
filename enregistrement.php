@@ -19,22 +19,33 @@ include('config.php'); // Inclure le fichier de configuration pour la connexion 
 const ERROR_EMAIL_USED = "Cette adresse courriel est déjà utilisée.";
 const ERROR_PASSWORD_MISMATCH = "Les mots de passe ne correspondent pas.";
 const ERROR_PASSWORD_INVALID = "Le mot de passe doit comporter entre 5 et 15 caractères, inclure des lettres (majuscules et minuscules) et des chiffres.";
+const ERROR_EMPTY_FIELDS = "Veuillez remplir tous les champs obligatoires.";
 const ERROR_REGISTRATION = "Erreur lors de l'enregistrement.";
 const SUCCESS_REGISTRATION = "Enregistrement réussi. Veuillez vérifier votre courriel pour confirmer votre inscription.";
 
 // Vérifiez si la méthode de la requête est POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Initialisation des messages d'erreur
+    $errors = [];
+    
+    // Récupération et nettoyage des données du formulaire
     $courriel = filter_var(trim($_POST['courriel']), FILTER_SANITIZE_EMAIL);
     $mot_de_passe = $_POST['password1'];
     $mot_de_passe_confirmation = $_POST['password2']; // Champ de confirmation
     $nom = trim($_POST['nom']);
     $prenom = trim($_POST['prenom']);
+    $noTelMaison = trim($_POST['noTelMaison']);
+    $noTelTravail = trim($_POST['noTelTravail']);
+    $noTelCellulaire = trim($_POST['noTelCellulaire']);
+    
+    // Vérifiez si les champs sont vides
+    if (empty($courriel) || empty($mot_de_passe) || empty($mot_de_passe_confirmation) || empty($nom) || empty($prenom) || empty($noTelMaison) || empty($noTelTravail) || empty($noTelCellulaire)) {
+        $errors[] = ERROR_EMPTY_FIELDS;
+    }
 
     // Vérifiez si les mots de passe correspondent
     if ($mot_de_passe !== $mot_de_passe_confirmation) {
-        $_SESSION['error'] = ERROR_PASSWORD_MISMATCH;
-        header('Location: enregistrement.php');
-        exit();
+        $errors[] = ERROR_PASSWORD_MISMATCH;
     }
 
     // Définir le motif de validation pour le mot de passe
@@ -42,9 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Vérifier si le mot de passe respecte les critères
     if (!preg_match($passwordPattern, $mot_de_passe)) {
-        $_SESSION['error'] = ERROR_PASSWORD_INVALID; // Use the constant for consistency
-        header('Location: enregistrement.php');
-        exit();
+        $errors[] = ERROR_PASSWORD_INVALID; // Use the constant for consistency
     }
 
     // Vérification de l'existence de l'email
@@ -55,63 +64,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Si l'email est déjà utilisé
     if ($result->num_rows > 0) {
-        $_SESSION['error'] = ERROR_EMAIL_USED;
+        $errors[] = ERROR_EMAIL_USED;
+    }
+
+    // Si des erreurs existent, retourner à la page d'enregistrement avec les messages d'erreur
+    if (!empty($errors)) {
+        $_SESSION['errors'] = $errors; // Stocker les erreurs dans la session
         header('Location: enregistrement.php');
         exit();
-    } else {
-        // Hachage du mot de passe et génération d'un token
-        $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
-        $token = bin2hex(random_bytes(16));
+    }
 
-        // Insérer les données dans la base de données
-        $stmt = $conn->prepare("INSERT INTO utilisateurs (Courriel, MotDePasse, Nom, Prenom, Statut, Token) VALUES (?, ?, ?, ?, 0, ?)");
-        $stmt->bind_param("sssss", $courriel, $hashed_password, $nom, $prenom, $token);
-        
-        if ($stmt->execute()) {
-            // Envoi du courriel de confirmation à l'utilisateur
-            $mail = new PHPMailer(true);
-            try {
-                // Configuration du serveur SMTP
-                $mail->isSMTP();
-                $mail->Host       = $_ENV['SMTP_HOST'];  
-                $mail->SMTPAuth   = true;
-                $mail->Username   = $_ENV['SMTP_USERNAME']; 
-                $mail->Password   = $_ENV['SMTP_PASSWORD'];
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
+    // Hachage du mot de passe et génération d'un token
+    $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
+    $token = bin2hex(random_bytes(16));
 
-                // Destinataire et contenu
-                $mail->setFrom('zarajeanfabrice@gmail.com', 'Gestion Annonces');
-                $mail->addAddress($courriel); // Envoi au nouvel utilisateur
+    // Insérer les données dans la base de données
+    $query = 'INSERT INTO utilisateurs (Courriel, MotDePasse, Nom, Prenom, Statut, Token, NoTelMaison, NoTelTravail, NoTelCellulaire) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)';
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ssssssss", $courriel, $hashed_password, $nom, $prenom, $token, $noTelMaison, $noTelTravail, $noTelCellulaire);
+    
+    if ($stmt->execute()) {
+        // Envoi du courriel de confirmation à l'utilisateur
+        $mail = new PHPMailer(true);
+        try {
+            // Configuration du serveur SMTP
+            $mail->isSMTP();
+            $mail->Host       = $_ENV['SMTP_HOST'];  
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $_ENV['SMTP_USERNAME']; 
+            $mail->Password   = $_ENV['SMTP_PASSWORD'];
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
 
-                // Contenu du message de confirmation à l'utilisateur
-                $mail->isHTML(true);
-                $mail->Subject = 'Confirmation de votre inscription';
-                $mail->Body    = "Bonjour $nom $prenom,<br><br>Merci pour votre inscription ! Veuillez confirmer votre adresse courriel en cliquant sur le lien suivant :<br><br>
-                <a href='http://localhost/GestionAnnonces/confirmation.php?token=$token'>Confirmer votre compte</a><br><br>Si vous n'avez pas créé ce compte, ignorez ce courriel.";
-                
-                $mail->send();
+            // Destinataire et contenu
+            $mail->setFrom('zarajeanfabrice@gmail.com', 'Gestion Annonces');
+            $mail->addAddress($courriel); // Envoi au nouvel utilisateur
 
-                // Redirection avec succès
-                $_SESSION['success'] = SUCCESS_REGISTRATION;
-                header('Location: login.php?message=Vérifiez votre courriel pour confirmer votre compte');
-                exit();
-            } catch (Exception $e) {
-                $_SESSION['error'] = "Le courriel n'a pas pu être envoyé. Erreur : " . $mail->ErrorInfo;
-                header('Location: enregistrement.php');
-                exit();
-            }
-        } else {
-            $_SESSION['error'] = ERROR_REGISTRATION;
+            // Contenu du message de confirmation à l'utilisateur
+            $mail->isHTML(true);
+            $mail->Subject = 'Confirmation de votre inscription';
+            $mail->Body    = "Bonjour $nom $prenom,<br><br>Merci pour votre inscription ! Veuillez confirmer votre adresse courriel en cliquant sur le lien suivant :<br><br>
+            <a href='http://localhost/GestionAnnonces/confirmation.php?token=$token'>Confirmer votre compte</a><br><br>Si vous n'avez pas créé ce compte, ignorez ce courriel.";
+            
+            $mail->send();
+
+            // Redirection avec succès
+            $_SESSION['success'] = SUCCESS_REGISTRATION;
+            header('Location: login.php?message=Vérifiez votre courriel pour confirmer votre compte');
+            exit();
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Le courriel n'a pas pu être envoyé. Erreur : " . $mail->ErrorInfo;
             header('Location: enregistrement.php');
             exit();
         }
+    } else {
+        $_SESSION['error'] = ERROR_REGISTRATION;
+        header('Location: enregistrement.php');
+        exit();
     }
+
     $stmt->close();
     $conn->close();
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+</head>
+<body>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -186,5 +210,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         formatPhoneInput('noTelTravail', 'telTypeTravail');
         formatPhoneInput('noTelCellulaire', 'telTypeCellulaire');
     </script>
+</body>
+</html>
+
+
+    <?php 
+    // Afficher les messages d'erreur
+    if (isset($_SESSION['errors']) && !empty($_SESSION['errors'])) {
+        echo '<div style="color: red;">';
+        foreach ($_SESSION['errors'] as $error) {
+            echo htmlspecialchars($error) . '<br>';
+        }
+        echo '</div>';
+        unset($_SESSION['errors']); // Réinitialiser après affichage
+    }
+    ?>
+    
 </body>
 </html>
