@@ -12,8 +12,8 @@ if (isset($_GET['token'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // Mettre à jour le statut de l'utilisateur
-        $stmt = $conn->prepare("UPDATE utilisateurs SET Statut = 1 WHERE Token = ?");
+        // Mettre à jour le statut de l'utilisateur à 9 (confirmé)
+        $stmt = $conn->prepare("UPDATE utilisateurs SET Statut = 9 WHERE Token = ?");
         $stmt->bind_param("s", $token);
         if ($stmt->execute()) {
             $_SESSION['success'] = "Votre compte a été confirmé avec succès.";
