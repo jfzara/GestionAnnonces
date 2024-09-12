@@ -116,21 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Enregistrement</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
 </head>
 <body>
-    <h1>Inscription</h1>
-
-    <?php
-    // Affichage des messages d'erreur ou de succès
-    foreach (['error', 'success'] as $msg) {
-        if (isset($_SESSION[$msg])) {
-            echo "<p style='color:".($msg === 'error' ? 'red' : 'green').";'>".$_SESSION[$msg]."</p>";
-            unset($_SESSION[$msg]);
-        }
-    }
-    ?>
-
     <form action="enregistrement.php" method="POST">
         <label for="email1">Courriel :</label>
         <input type="email" name="courriel" id="email1" required value="<?php echo isset($_POST['courriel']) ? htmlspecialchars($_POST['courriel']) : ''; ?>">
@@ -147,7 +136,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="prenom">Prénom :</label>
         <input type="text" name="prenom" id="prenom" required value="<?php echo isset($_POST['prenom']) ? htmlspecialchars($_POST['prenom']) : ''; ?>">
         <br>
-        <input type="submit" value="S'enregistrer">
+        <label for="noTelMaison">Numéro de téléphone (Maison) :</label>
+        <input type="text" name="noTelMaison" id="noTelMaison" required value="<?php echo isset($_POST['noTelMaison']) ? htmlspecialchars($_POST['noTelMaison']) : ''; ?>">
+        <label for="telTypeMaison">Public (P) ou Non-Public (N)</label>
+        <select name="telTypeMaison" id="telTypeMaison">
+            <option value="P">Public</option>
+            <option value="N">Non-Public</option>
+        </select>
+        <br>
+        <label for="noTelTravail">Numéro de téléphone (Travail) :</label>
+        <input type="text" name="noTelTravail" id="noTelTravail" required value="<?php echo isset($_POST['noTelTravail']) ? htmlspecialchars($_POST['noTelTravail']) : ''; ?>">
+        <label for="telTypeTravail">Public (P) ou Non-Public (N)</label>
+        <select name="telTypeTravail" id="telTypeTravail">
+            <option value="P">Public</option>
+            <option value="N">Non-Public</option>
+        </select>
+        <br>
+        <label for="noTelCellulaire">Numéro de téléphone (Cellulaire) :</label>
+        <input type="text" name="noTelCellulaire" id="noTelCellulaire" required value="<?php echo isset($_POST['noTelCellulaire']) ? htmlspecialchars($_POST['noTelCellulaire']) : ''; ?>">
+        <label for="telTypeCellulaire">Public (P) ou Non-Public (N)</label>
+        <select name="telTypeCellulaire" id="telTypeCellulaire">
+            <option value="P">Public</option>
+            <option value="N">Non-Public</option>
+        </select>
+        <br>
+        <button type="submit">S'inscrire</button>
     </form>
+
+    <script>
+        function formatPhoneInput(inputId, selectId) {
+            document.getElementById(inputId).addEventListener('input', function (e) {
+                let input = e.target.value;
+
+                // Retirer tout sauf les chiffres
+                let digitsOnly = input.replace(/\D/g, '');
+
+                // Limiter à 10 chiffres
+                if (digitsOnly.length > 10) {
+                    digitsOnly = digitsOnly.slice(0, 10);
+                }
+
+                // Mettre à jour la valeur de l'input sans formatage visible
+                e.target.value = digitsOnly;
+            });
+        }
+
+        // Appliquer la fonction à chaque champ de téléphone avec le select correspondant
+        formatPhoneInput('noTelMaison', 'telTypeMaison');
+        formatPhoneInput('noTelTravail', 'telTypeTravail');
+        formatPhoneInput('noTelCellulaire', 'telTypeCellulaire');
+    </script>
 </body>
 </html>
