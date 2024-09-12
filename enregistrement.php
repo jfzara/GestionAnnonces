@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Vérifier si le mot de passe respecte les critères
     if (!preg_match($passwordPattern, $mot_de_passe)) {
-        $errors[] = ERROR_PASSWORD_INVALID; // Use the constant for consistency
+        $errors[] = ERROR_PASSWORD_INVALID;
     }
 
     // Vérification de l'existence de l'email
@@ -70,72 +70,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Si des erreurs existent, retourner à la page d'enregistrement avec les messages d'erreur
     if (!empty($errors)) {
         $_SESSION['errors'] = $errors; // Stocker les erreurs dans la session
-        header('Location: enregistrement.php');
-        exit();
-    }
-
-    // Hachage du mot de passe et génération d'un token
-    $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
-    $token = bin2hex(random_bytes(16));
-
-    // Insérer les données dans la base de données
-    $query = 'INSERT INTO utilisateurs (Courriel, MotDePasse, Nom, Prenom, Statut, Token, NoTelMaison, NoTelTravail, NoTelCellulaire) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)';
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssssssss", $courriel, $hashed_password, $nom, $prenom, $token, $noTelMaison, $noTelTravail, $noTelCellulaire);
-    
-    if ($stmt->execute()) {
-        // Envoi du courriel de confirmation à l'utilisateur
-        $mail = new PHPMailer(true);
-        try {
-            // Configuration du serveur SMTP
-            $mail->isSMTP();
-            $mail->Host       = $_ENV['SMTP_HOST'];  
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $_ENV['SMTP_USERNAME']; 
-            $mail->Password   = $_ENV['SMTP_PASSWORD'];
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-
-            // Destinataire et contenu
-            $mail->setFrom('zarajeanfabrice@gmail.com', 'Gestion Annonces');
-            $mail->addAddress($courriel); // Envoi au nouvel utilisateur
-
-            // Contenu du message de confirmation à l'utilisateur
-            $mail->isHTML(true);
-            $mail->Subject = 'Confirmation de votre inscription';
-            $mail->Body    = "Bonjour $nom $prenom,<br><br>Merci pour votre inscription ! Veuillez confirmer votre adresse courriel en cliquant sur le lien suivant :<br><br>
-            <a href='http://localhost/GestionAnnonces/confirmation.php?token=$token'>Confirmer votre compte</a><br><br>Si vous n'avez pas créé ce compte, ignorez ce courriel.";
-            
-            $mail->send();
-
-            // Redirection avec succès
-            $_SESSION['success'] = SUCCESS_REGISTRATION;
-            header('Location: login.php?message=Vérifiez votre courriel pour confirmer votre compte');
-            exit();
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Le courriel n'a pas pu être envoyé. Erreur : " . $mail->ErrorInfo;
-            header('Location: enregistrement.php');
-            exit();
-        }
     } else {
-        $_SESSION['error'] = ERROR_REGISTRATION;
-        header('Location: enregistrement.php');
-        exit();
-    }
+        // Hachage du mot de passe et génération d'un token
+        $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
+        $token = bin2hex(random_bytes(16));
 
+        // Insérer les données dans la base de données
+        $query = 'INSERT INTO utilisateurs (Courriel, MotDePasse, Nom, Prenom, Statut, Token, NoTelMaison, NoTelTravail, NoTelCellulaire) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)';
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ssssssss", $courriel, $hashed_password, $nom, $prenom, $token, $noTelMaison, $noTelTravail, $noTelCellulaire);
+        
+        if ($stmt->execute()) {
+            // Envoi du courriel de confirmation à l'utilisateur
+            $mail = new PHPMailer(true);
+            try {
+                // Configuration du serveur SMTP
+                $mail->isSMTP();
+                $mail->Host       = $_ENV['SMTP_HOST'];  
+                $mail->SMTPAuth   = true;
+                $mail->Username   = $_ENV['SMTP_USERNAME']; 
+                $mail->Password   = $_ENV['SMTP_PASSWORD'];
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port       = 587;
+
+                // Destinataire et contenu
+                $mail->setFrom('zarajeanfabrice@gmail.com', 'Gestion Annonces');
+                $mail->addAddress($courriel); // Envoi au nouvel utilisateur
+
+                // Contenu du message de confirmation à l'utilisateur
+                $mail->isHTML(true);
+                $mail->Subject = 'Confirmation de votre inscription';
+                $mail->Body    = "Bonjour $nom $prenom,<br><br>Merci pour votre inscription ! Veuillez confirmer votre adresse courriel en cliquant sur le lien suivant :<br><br>
+                <a href='http://localhost/GestionAnnonces/confirmation.php?token=$token'>Confirmer votre compte</a><br><br>Si vous n'avez pas créé ce compte, ignorez ce courriel.";
+                
+                $mail->send();
+
+                // Stocker un message de succès dans la session pour affichage
+                $_SESSION['success'] = SUCCESS_REGISTRATION;
+            } catch (Exception $e) {
+                $_SESSION['error'] = "Le courriel n'a pas pu être envoyé. Erreur : " . $mail->ErrorInfo;
+            }
+        } else {
+            $_SESSION['error'] = ERROR_REGISTRATION;
+        }
+    }
     $stmt->close();
     $conn->close();
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription</title>
-</head>
-<body>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -178,53 +161,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <label for="noTelCellulaire">Numéro de téléphone (Cellulaire) :</label>
         <input type="text" name="noTelCellulaire" id="noTelCellulaire" required value="<?php echo isset($_POST['noTelCellulaire']) ? htmlspecialchars($_POST['noTelCellulaire']) : ''; ?>">
-        <label for="telTypeCellulaire">Public (P) ou Non-Public (N)</label>
-        <select name="telTypeCellulaire" id="telTypeCellulaire">
-            <option value="P">Public</option>
-            <option value="N">Non-Public</option>
-        </select>
         <br>
         <button type="submit">S'inscrire</button>
     </form>
 
-    <script>
-        function formatPhoneInput(inputId, selectId) {
-            document.getElementById(inputId).addEventListener('input', function (e) {
-                let input = e.target.value;
+    <!-- Affichage des erreurs s'il y en a -->
+    <?php if (isset($_SESSION['errors']) && !empty($_SESSION['errors'])): ?>
+        <div class="errors">
+            <?php foreach ($_SESSION['errors'] as $error): ?>
+                <p><?php echo htmlspecialchars($error); ?></p>
+            <?php endforeach; ?>
+        </div>
+        <?php unset($_SESSION['errors']); // Effacer les erreurs après les avoir affichées ?>
+    <?php endif; ?>
 
-                // Retirer tout sauf les chiffres
-                let digitsOnly = input.replace(/\D/g, '');
-
-                // Limiter à 10 chiffres
-                if (digitsOnly.length > 10) {
-                    digitsOnly = digitsOnly.slice(0, 10);
-                }
-
-                // Mettre à jour la valeur de l'input sans formatage visible
-                e.target.value = digitsOnly;
-            });
-        }
-
-        // Appliquer la fonction à chaque champ de téléphone avec le select correspondant
-        formatPhoneInput('noTelMaison', 'telTypeMaison');
-        formatPhoneInput('noTelTravail', 'telTypeTravail');
-        formatPhoneInput('noTelCellulaire', 'telTypeCellulaire');
-    </script>
-</body>
-</html>
-
-
-    <?php 
-    // Afficher les messages d'erreur
-    if (isset($_SESSION['errors']) && !empty($_SESSION['errors'])) {
-        echo '<div style="color: red;">';
-        foreach ($_SESSION['errors'] as $error) {
-            echo htmlspecialchars($error) . '<br>';
-        }
-        echo '</div>';
-        unset($_SESSION['errors']); // Réinitialiser après affichage
-    }
-    ?>
-    
+    <!-- Affichage du message de succès -->
+    <?php if (isset($_SESSION['success'])): ?>
+        <p class="success"><?php echo htmlspecialchars($_SESSION['success']); ?></p>
+        <?php unset($_SESSION['success']); // Effacer le message après l'avoir affiché ?>
+    <?php endif; ?>
 </body>
 </html>
