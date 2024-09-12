@@ -125,6 +125,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription</title>
+    <style>
+        /* Style pour les messages d'erreur */
+        .errors {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Style pour les messages de succès */
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <form action="enregistrement.php" method="POST">
