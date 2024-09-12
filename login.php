@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer les données du formulaire
     $courriel = trim($_POST['courriel']);
     $mot_de_passe = $_POST['mot_de_passe'];
-    $confirmation_mot_de_passe = $_POST['confirmation_mot_de_passe']; // Nouveau champ
+    $confirmation_mot_de_passe = $_POST['confirmation_mot_de_passe'];
 
     // Vérification si les mots de passe correspondent
     if ($mot_de_passe !== $confirmation_mot_de_passe) {
@@ -60,6 +60,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Connexion</title>
+    <script>
+        function validateForm() {
+            const email = document.getElementById('courriel').value;
+            const password = document.getElementById('mot_de_passe').value;
+            const confirmPassword = document.getElementById('confirmation_mot_de_passe').value;
+
+            // Validation de l'adresse courriel
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailPattern.test(email)) {
+                alert("Veuillez entrer une adresse e-mail valide.");
+                return false;
+            }
+
+            // Validation du mot de passe
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{5,15}$/;
+            if (!passwordPattern.test(password)) {
+                alert("Le mot de passe doit comporter entre 5 et 15 caractères, inclure des lettres (majuscules et minuscules) et des chiffres.");
+                return false;
+            }
+
+            // Vérification si les mots de passe correspondent
+            if (password !== confirmPassword) {
+                alert("Les mots de passe ne correspondent pas.");
+                return false;
+            }
+
+            return true; // Si tout est valide, soumettre le formulaire
+        }
+    </script>
 </head>
 <body>
     <h1>Connexion</h1>
@@ -72,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     ?>
 
-    <form action="login.php" method="POST">
+    <form action="login.php" method="POST" onsubmit="return validateForm();">
         <label for="courriel">Courriel :</label>
         <input type="email" name="courriel" id="courriel" required>
         <br>

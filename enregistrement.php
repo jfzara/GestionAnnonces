@@ -18,6 +18,7 @@ include('config.php'); // Inclure le fichier de configuration pour la connexion 
 
 const ERROR_EMAIL_USED = "Cette adresse courriel est déjà utilisée.";
 const ERROR_PASSWORD_MISMATCH = "Les mots de passe ne correspondent pas.";
+const ERROR_PASSWORD_INVALID = "Le mot de passe doit comporter entre 5 et 15 caractères, inclure des lettres (majuscules et minuscules) et des chiffres.";
 const ERROR_REGISTRATION = "Erreur lors de l'enregistrement.";
 const SUCCESS_REGISTRATION = "Enregistrement réussi. Veuillez vérifier votre courriel pour confirmer votre inscription.";
 
@@ -32,6 +33,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Vérifiez si les mots de passe correspondent
     if ($mot_de_passe !== $mot_de_passe_confirmation) {
         $_SESSION['error'] = ERROR_PASSWORD_MISMATCH;
+        header('Location: enregistrement.php');
+        exit();
+    }
+
+    // Définir le motif de validation pour le mot de passe
+    $passwordPattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{5,15}$/';
+
+    // Vérifier si le mot de passe respecte les critères
+    if (!preg_match($passwordPattern, $mot_de_passe)) {
+        $_SESSION['error'] = ERROR_PASSWORD_INVALID; // Use the constant for consistency
         header('Location: enregistrement.php');
         exit();
     }
@@ -100,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->close();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
