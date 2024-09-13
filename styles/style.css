@@ -1,14 +1,29 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;   /* Centrer horizontalement */
+    align-items: center;       /* Centrer verticalement */
+    min-height: 100vh;        /* Prendre toute la hauteur de la fenêtre */
+    margin: 0;                /* Supprimer la marge par défaut */
+    font-family: Arial, sans-serif; /* Police de caractères */
+    background-color: #f4f4f4; /* Couleur de fond */
 }
 
+/* Titres */
 h1 {
     color: #333;
 }
 
+/* Conteneur pour centrer le contenu */
+.container {
+    text-align: center;        /* Centrer le texte à l'intérieur du conteneur */
+    padding: 20px;            /* Espacement interne du conteneur */
+    border: 1px solid #ddd;   /* Bordure autour du conteneur */
+    border-radius: 10px;      /* Coins arrondis pour le conteneur */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre autour du conteneur */
+    background-color: #f9f9f9; /* Couleur de fond du conteneur */
+}
+
+/* Styles de formulaire */
 form {
     background: #fff;
     padding: 20px;
@@ -16,6 +31,7 @@ form {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Étiquettes et champs de formulaire */
 label {
     display: block;
     margin: 10px 0 5px;
@@ -29,6 +45,7 @@ input {
     border-radius: 5px;
 }
 
+/* Bouton */
 button {
     padding: 10px;
     background-color: #007bff;
@@ -40,4 +57,33 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+/* Navigation */
+nav {
+    background-color: #f8f8f8; /* Couleur de fond */
+    padding: 10px;             /* Espacement interne */
+}
+
+nav ul {
+    display: flex;             /* Utiliser Flexbox */
+    flex-direction: row;      /* Aligner les éléments en ligne */
+    list-style-type: none;    /* Supprimer les puces */
+    padding: 0;               /* Supprimer le padding par défaut */
+    margin: 0;                /* Supprimer la marge par défaut */
+}
+
+nav li {
+    margin: 0 15px;           /* Espacement horizontal entre les éléments */
+}
+
+nav a {
+    text-decoration: none;     /* Supprimer le soulignement des liens */
+    color: #333;               /* Couleur du texte */
+    padding: 10px;            /* Espacement autour des liens */
+}
+
+nav a:hover {
+    background-color: #eaeaea; /* Couleur de fond au survol */
+    border-radius: 5px;       /* Arrondir les coins */
 }
