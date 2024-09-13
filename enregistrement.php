@@ -6,7 +6,7 @@ require 'vendor/autoload.php';
 
 session_start(); // Démarrer la session au début
 
-// Charger les variables d'environnement à partir du fichier .env
+// Charger les variables d'environnement à partir du fichier .env + gestion si .env est introuvable
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 try {
     $dotenv->load();

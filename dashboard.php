@@ -1,5 +1,5 @@
 <?php
-session_start(); // Assurez-vous d'inclure session_start() ici
+session_start(); 
 
 include 'config.php';
 
@@ -34,7 +34,7 @@ if (!isset($_SESSION['NoUtilisateur'])) {
         <!-- Contenu par défaut : Affichage de toutes les annonces -->
         <section id="content">
             <h2>Liste des annonces</h2>
-            <!-- Ici tu peux inclure le code pour afficher les annonces -->
+           
         </section>
     </div>
 </body>

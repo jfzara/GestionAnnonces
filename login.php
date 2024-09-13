@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
 
-// Inclure le fichier de configuration pour la connexion à la base de données
+
 include('config.php');
 
 // Fonction pour vérifier si l'utilisateur est authentifié
@@ -15,7 +15,7 @@ function checkAuth() {
     }
 }
 
-// Appeler la fonction pour vérifier l'authentification
+
 checkAuth();
 
 // Gérer la connexion
