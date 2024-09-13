@@ -9,7 +9,7 @@ include('config.php');
 
 // Fonction pour vérifier si l'utilisateur est authentifié
 function checkAuth() {
-    if (isset($_SESSION['user_id'])) {
+    if (isset($_SESSION['NoUtilisateur'])) {
         header("Location: dashboard.php"); // Rediriger vers le tableau de bord si déjà connecté
         exit();
     }
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['NoConnexion'] = $NoConnexion; // Stocker l'ID de la connexion dans la session
 
                 // Enregistrer l'ID de l'utilisateur dans la session
-                $_SESSION['user_id'] = $user['NoUtilisateur'];
+                $_SESSION['NoUtilisateur'] = $user['NoUtilisateur'];
                 header('Location: dashboard.php'); // Rediriger vers le tableau de bord
                 exit();
             } else {

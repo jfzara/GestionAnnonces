@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Télécharger l'image si tout est correct
     if ($uploadOk == 1 && move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetFile)) {
-        echo "Le fichier " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " a été téléchargé.";
+        echo "Le fichier " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " a été téléchargé.  ";
     } else {
         echo "Désolé, une erreur est survenue lors du téléchargement de votre fichier.";
         $targetFile = ""; // Mettre à jour si le fichier n'a pas été téléchargé
@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bind_param("issdsi", $categorie, $petiteDesc, $grosseDesc, $prix, $targetFile, $active);
             $stmt->execute();
 
-            echo "Annonce ajoutée avec succès.";
+            echo "    Annonce ajoutée avec succès.";
         } catch (mysqli_sql_exception $e) {
             echo "Erreur lors de l'insertion : " . $e->getMessage();
         }

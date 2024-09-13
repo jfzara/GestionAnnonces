@@ -3,7 +3,7 @@ session_start(); // Assurez-vous d'inclure session_start() ici
 
 include 'config.php';
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['NoUtilisateur'])) {
     header("Location: login.php");
     exit();
 }
