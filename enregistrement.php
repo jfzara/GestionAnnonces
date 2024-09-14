@@ -125,22 +125,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription</title>
-    <style>
-        /* Style pour les messages d'erreur */
-        .errors {
-            color: red;
-            font-weight: bold;
-        }
-
-        /* Style pour les messages de succès */
-        .success {
-            color: green;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <form action="enregistrement.php" method="POST">
+<!-- Affichage des erreurs s'il y en a -->
+<?php if (isset($_SESSION['errors']) && !empty($_SESSION['errors'])): ?>
+        <div class="errors">
+            <?php foreach ($_SESSION['errors'] as $error): ?>
+                <p><?php echo htmlspecialchars($error); ?></p>
+            <?php endforeach; ?>
+        </div>
+        <?php unset($_SESSION['errors']); // Effacer les erreurs après les avoir affichées ?>
+    <?php endif; ?>
+
+    <!-- Affichage du message de succès -->
+    <?php if (isset($_SESSION['success'])): ?>
+        <p class="success"><?php echo htmlspecialchars($_SESSION['success']); ?></p>
+        <?php unset($_SESSION['success']); // Effacer le message après l'avoir affiché ?>
+    <?php endif; ?>
+
+    <form class = "register_form" action="enregistrement.php" method="POST">
+    <p class="titre">Inscription</p>
         <label for="email1">Courriel :</label>
         <input type="email" name="courriel" id="email1" required value="<?php echo isset($_POST['courriel']) ? htmlspecialchars($_POST['courriel']) : ''; ?>">
         <br>
@@ -158,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <label for="noTelMaison">Numéro de téléphone (Maison) :</label>
         <input type="text" name="noTelMaison" id="noTelMaison" required value="<?php echo isset($_POST['noTelMaison']) ? htmlspecialchars($_POST['noTelMaison']) : ''; ?>">
-        <label for="telTypeMaison">Public (P) ou Non-Public (N)</label>
+        <label for="telTypeMaison"> </label>
         <select name="telTypeMaison" id="telTypeMaison">
             <option value="P">Public</option>
             <option value="N">Non-Public</option>
@@ -166,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <label for="noTelTravail">Numéro de téléphone (Travail) :</label>
         <input type="text" name="noTelTravail" id="noTelTravail" required value="<?php echo isset($_POST['noTelTravail']) ? htmlspecialchars($_POST['noTelTravail']) : ''; ?>">
-        <label for="telTypeTravail">Public (P) ou Non-Public (N)</label>
+        <label for="telTypeTravail"> </label>
         <select name="telTypeTravail" id="telTypeTravail">
             <option value="P">Public</option>
             <option value="N">Non-Public</option>
@@ -177,21 +182,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <button type="submit">S'inscrire</button>
     </form>
-
-    <!-- Affichage des erreurs s'il y en a -->
-    <?php if (isset($_SESSION['errors']) && !empty($_SESSION['errors'])): ?>
-        <div class="errors">
-            <?php foreach ($_SESSION['errors'] as $error): ?>
-                <p><?php echo htmlspecialchars($error); ?></p>
-            <?php endforeach; ?>
-        </div>
-        <?php unset($_SESSION['errors']); // Effacer les erreurs après les avoir affichées ?>
-    <?php endif; ?>
-
-    <!-- Affichage du message de succès -->
-    <?php if (isset($_SESSION['success'])): ?>
-        <p class="success"><?php echo htmlspecialchars($_SESSION['success']); ?></p>
-        <?php unset($_SESSION['success']); // Effacer le message après l'avoir affiché ?>
-    <?php endif; ?>
+    
 </body>
 </html>

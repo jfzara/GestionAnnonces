@@ -11,59 +11,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $prix = $_POST['tbPrixAnnonce'];
     $active = $_POST['Activation'];
 
-    // Gestion de l'upload d'image
-    $targetDir = "photos-annonces/";
-    $targetFile = $targetDir . basename($_FILES["fileToUpload"]["name"]);
-    $uploadOk = 1;
-    $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+   // Gestion de l'upload d'image
+$targetDir = "photos-annonces/";
+$targetFile = $targetDir . basename($_FILES["fileToUpload"]["name"]);
+$uploadOk = 1;
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-    // Vérifier si le fichier est une image
-    $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-    if ($check === false) {
-        echo "Ce fichier n'est pas une image.";
-        $uploadOk = 0;
+// Vérifier si le fichier est une image
+$check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+if ($check === false) {
+    echo "Ce fichier n'est pas une image.";
+    $uploadOk = 0;
+}
+
+// Vérifier la taille du fichier
+if ($_FILES["fileToUpload"]["size"] > 100000) {
+    echo "Désolé, votre fichier est trop volumineux.";
+    $uploadOk = 0;
+}
+
+// Autoriser certains formats de fichiers
+if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+    echo "Désolé, seuls les fichiers JPG, JPEG, PNG et GIF sont autorisés.";
+    $uploadOk = 0;
+}
+
+// Télécharger l'image si tout est correct
+if ($uploadOk == 1 && move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetFile)) {
+    echo "Le fichier " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " a été téléchargé. ";
+} else {
+    echo "Désolé, une erreur est survenue lors du téléchargement de votre fichier.";
+    $targetFile = ""; // Mettre à jour si le fichier n'a pas été téléchargé
+}
+
+// Insérer les données dans la base de données
+if ($uploadOk == 1) {
+    try {
+        $query = "INSERT INTO annonces (Categorie, DescriptionAbregee, DescriptionComplete, Prix, Photo, Etat) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("issdsi", $categorie, $petiteDesc, $grosseDesc, $prix, $targetFile, $active);
+        $stmt->execute();
+
+        echo "Annonce ajoutée avec succès !";
+    } catch (mysqli_sql_exception $e) {
+        echo "Erreur lors de l'insertion : " . $e->getMessage();
     }
-
-    // Vérifier si le fichier existe déjà
-    if (file_exists($targetFile)) {
-        $fileNameWithoutExtension = pathinfo($targetFile, PATHINFO_FILENAME);
-        $uniqueSuffix = time(); 
-        $targetFile = $targetDir . $fileNameWithoutExtension . '_' . $uniqueSuffix . '.' . $imageFileType;
-    }
-
-    // Vérifier la taille du fichier
-    if ($_FILES["fileToUpload"]["size"] > 100000) {
-        echo "Désolé, votre fichier est trop volumineux.";
-        $uploadOk = 0;
-    }
-
-    // Autoriser certains formats de fichiers
-    if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-        echo "Désolé, seuls les fichiers JPG, JPEG, PNG et GIF sont autorisés.";
-        $uploadOk = 0;
-    }
-
-    // Télécharger l'image si tout est correct
-    if ($uploadOk == 1 && move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetFile)) {
-        echo "Le fichier " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " a été téléchargé.  ";
-    } else {
-        echo "Désolé, une erreur est survenue lors du téléchargement de votre fichier.";
-        $targetFile = ""; // Mettre à jour si le fichier n'a pas été téléchargé
-    }
-
-    // Insérer les données dans la base de données si tout est correct
-    if ($uploadOk == 1) {
-        try {
-            $query = "INSERT INTO annonces (Categorie, DescriptionAbregee, DescriptionComplete, Prix, Photo, Etat) VALUES (?, ?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("issdsi", $categorie, $petiteDesc, $grosseDesc, $prix, $targetFile, $active);
-            $stmt->execute();
-
-            echo "    Annonce ajoutée avec succès.";
-        } catch (mysqli_sql_exception $e) {
-            echo "Erreur lors de l'insertion : " . $e->getMessage();
-        }
-    }
+  }
 }
 ?>
 
@@ -105,8 +98,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <div class="form-group">
-            <label>Prix :</label>
-            <input type="text" class="form-control" name="tbPrixAnnonce" required placeholder="Prix">
+            <label>Prix ($):</label>
+            <input type="number" class="form-control" name="tbPrixAnnonce" required placeholder="Prix">
+            <span class="input-group-text">$</span>
         </div>
 
         <div class="form-group">
@@ -124,6 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <input type="submit" value="Ajouter" class="btn btn-primary">
         <a href="index.php" class="btn btn-secondary">Annuler</a>
+        <a href="dashboard.php" class="btn btn-info">Retour au Dashboard</a>
     </form>
 </div>
 </body>

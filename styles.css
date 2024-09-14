@@ -1,0 +1,143 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* Centrer horizontalement */
+    align-items: center;       /* Centrer verticalement */
+    min-height: 100vh;        /* Prendre toute la hauteur de la fenêtre */
+    margin: 0;                /* Supprimer la marge par défaut */
+    font-family: Arial, sans-serif; /* Police de caractères */
+   /*  background-color: #f4f4f4; Couleur de fond */
+ 
+}
+
+/* Titres */
+h1 {
+    color: #333;
+    margin-bottom: 20px; /* Espacement sous le titre */
+}
+
+/* Conteneur pour centrer le contenu */
+.container {
+  
+    text-align: center;        /* Centrer le texte à l'intérieur du conteneur */
+    padding: 30px;            /* Espacement interne du conteneur */
+    border: 1px solid #ddd;   /* Bordure autour du conteneur */
+    border-radius: 10px;      /* Coins arrondis pour le conteneur */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre autour du conteneur */
+    max-width: 400px;        /* Largeur maximale du conteneur */
+}
+
+/* Styles de formulaire */
+form {
+   
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: #dfe0e4;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-width: 36%;
+    padding-left: 1vw;
+    padding-right: 3vw;
+    position: absolute;
+    top: 0;
+}
+
+/* Classes pour les messages d'erreur et de succès */
+.success {
+    color: green;  
+    margin-top: 10px;  
+}
+.error {
+    color: red;  
+    margin-top: 10px;  
+}
+
+/* Étiquettes et champs de formulaire */
+label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;   
+    color: #353535;     /* Mettre les étiquettes en gras */
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s; /* Transition pour le changement de bordure */
+}
+
+input:focus {
+    border-color: #007bff;    /* Couleur de la bordure au focus */
+    outline: none;             /* Supprimer le contour par défaut */
+}
+
+/* Bouton */
+button, .soumettre {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;               /* Bouton prend toute la largeur */
+    transition: background-color 0.3s; /* Transition pour le changement de couleur */
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Navigation */
+nav {
+    background-color: #f8f8f8; /* Couleur de fond */
+    padding: 10px;             /* Espacement interne */
+}
+
+nav ul {
+    display: flex;             /* Utiliser Flexbox */
+    flex-direction: row;      /* Aligner les éléments en ligne */
+    list-style-type: none;    /* Supprimer les puces */
+    padding: 0;               /* Supprimer le padding par défaut */
+    margin: 0;                /* Supprimer la marge par défaut */
+}
+
+nav li  {
+    margin: 0 15px; 
+            /* Espacement horizontal entre les éléments */
+   font-weight: bold;     
+}
+
+nav a, .lien {
+    text-decoration: underline ;      /* Supprimer le soulignement des liens */
+    color: blue;                /* Couleur du texte */
+    padding: 10px;              /* Espacement autour des liens */
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;  /* Transition fluide pour les effets */
+}
+
+nav a:hover, .lien:hover {
+      /* Couleur de fond au survol */
+    color: violet;                 /* Changer la couleur du texte au survol */
+}
+
+/* Style pour les messages d'erreur */
+.errors {
+    color: red;
+    font-weight: bold;
+}
+
+/* Style pour les messages de succès */
+.success {
+    color: green;
+    font-weight: bold;
+}
+
+.titre{
+    font-size: 2rem;
+    font-weight: bold;
+}
