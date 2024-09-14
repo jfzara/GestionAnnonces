@@ -13,6 +13,26 @@ if ($conn->connect_error) {
     die("Échec de la connexion: " . $conn->connect_error);
 }
 
+// Fonction pour obtenir le nom de la catégorie
+function getCategoryName($categoryNumber) {
+    switch ($categoryNumber) {
+        case 1:
+            return 'Location';
+        case 2:
+            return 'Recherche';
+        case 3:
+            return 'À vendre';
+        case 4:
+            return 'À donner';
+        case 5:
+            return 'Service offert';
+        case 6:
+            return 'Autre';
+        default:
+            return 'Inconnue';
+    }
+}
+
 // Récupération des annonces
 $sql = "SELECT NoAnnonce, Categorie, DescriptionAbregee, DescriptionComplete, Prix, Photo, Parution FROM annonces";
 $result = $conn->query($sql);
@@ -23,11 +43,11 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <title>Annonces</title>
-    <link rel="stylesheet" href="path/to/bootstrap.css"> <!-- Lier Bootstrap -->
+    <link rel="stylesheet" href="styles.css"> <!-- Lier votre fichier de style -->
 </head>
 <body>
 
-<div id="divListe" class="d-flex flex-wrap justify-content-around mt-2 border-secondary">
+<div id="divListe" >
     <?php
     if ($result->num_rows > 0) {
         // Compteur pour le numéro séquentiel
@@ -38,29 +58,28 @@ $result = $conn->query($sql);
             $datePublication = date('Y-m-d H:i', strtotime($row['Parution']));
             $photoUrl = !empty($row['Photo']) ? $row['Photo'] : 'default.jpg'; // Par défaut si pas de photo
             ?>
-            <div id="divAnnonce-<?php echo $row['NoAnnonce']; ?>" class="m-3">
-                <div class="card annonce">
-                    <div class="card-header d-flex justify-content-between py-1">
-                        <div class="text-left"><?php echo $sequentialNumber++; ?></div>
-                        <div class="text-right">Catégorie : <?php echo $row['Categorie']; ?></div>
+            <div id="divAnnonce-<?php echo $row['NoAnnonce']; ?>" class="annonce">
+                <div class="annonce-header">
+                    <div class="text-left"><?php echo $sequentialNumber++; ?></div>
+                    <div class="text-right"><?php echo getCategoryName($row['Categorie']); ?></div>
+                </div>
+                <div class="annonce-image">
+                    <img alt="Image de <?php echo $row['DescriptionAbregee']; ?>" src="<?php echo $photoUrl; ?>" width="144" class="m-auto" style="height: auto;">
+                </div>
+                <div class="annonce-body">
+                    <h6 class="annonce-title">
+                        <a href="Annonce.php?id=<?php echo $row['NoAnnonce']; ?>"><?php echo $row['DescriptionAbregee']; ?></a>
+                    </h6>
+                    <p class="non-gras"><?php echo $row['DescriptionComplete']; ?></p>
+                    <div class="text-right font-weight-bold">
+                        <span>
+                            <?php echo !empty($row['Prix']) ? number_format($row['Prix'], 2, '.', ' ') . " $" : 'N/A'; ?>
+                        </span>
                     </div>
-                    <div class="overflow-hidden text-right imageSize">
-                        <img alt="Image de <?php echo $row['DescriptionAbregee']; ?>" src="<?php echo $photoUrl; ?>" width="144" class="m-auto" style="height: auto;">
-                    </div>
-                    <div class="card-body pb-1">
-                        <h6 class="card-title">
-                            <a href="Annonce.php?id=<?php echo $row['NoAnnonce']; ?>"><?php echo $row['DescriptionAbregee']; ?></a>
-                        </h6>
-                        <p><?php echo $row['DescriptionComplete']; ?></p>
-                        <div class="text-right font-weight-bold">
-                            <span>
-                                <?php echo !empty($row['Prix']) ? number_format($row['Prix'], 2, '.', ' ') . " $" : 'N/A'; ?>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="card-footer d-flex justify-content-between py-0">
-                        <div class="text-left">Publié le : <?php echo $datePublication; ?></div>
-                    </div>
+                </div>
+                <div class="annonce-footer">
+                    <div class="text-left"><?php echo $datePublication; ?></div>
+                    <div class="text-right"><?php echo $row['NoAnnonce']; ?></div> <!-- Numéro d'incrément -->
                 </div>
             </div>
             <?php
@@ -72,6 +91,5 @@ $result = $conn->query($sql);
     ?>
 </div>
 
-<script src="path/to/bootstrap.bundle.js"></script> 
 </body>
 </html>

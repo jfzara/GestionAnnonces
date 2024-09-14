@@ -159,3 +159,92 @@ nav a:hover, .lien:hover, .lien_enregistrement:hover {
     font-size: 2rem;
     font-weight: bold;
 }
+
+/* Style global pour les annonces */
+/* Style pour le conteneur de la liste d'annonces */
+#divListe {
+    display: flex;          /* Utiliser Flexbox */
+    flex-wrap: wrap;       /* Permettre aux cartes de revenir à la ligne */
+    justify-content: space-evenly;   /* Aligner les éléments à droite */
+    width: 100%;    
+ 
+}
+
+
+.annonce {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch; /* Étendre les éléments */
+    border: 1px solid rgba(0, 0, 0, .125);
+    border-radius: .25rem;
+    background-color: #fff;
+  
+   width: 15vw; /* Largeur min de l'annonce */
+  
+    height: 400px;  /* Hauteur de l'annonce */
+    margin: 20px;   /* Marges autour de chaque annonce */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre autour de l'annonce */
+    padding: 0; /* Supprimer le padding */
+}
+
+/* En-tête de l'annonce et pied de l'annonce */
+.annonce-header,
+.annonce-footer {
+    background-color: #f0f0f0; /* Couleur de fond gris très clair */
+    border-radius: 5px;      /* Coins arrondis */
+    width: 100%;   
+  
+             /* Largeur complète */
+}
+
+/* Image de l'annonce */
+.annonce-image {
+    overflow: hidden;  /* Pour éviter les débordements d'images */
+width: 100%;           /* L'image prendra toute la largeur */
+height: 200px;            /* L'image prendra toute la hauteur */
+object-fit: cover;     /* Couvre tout l'espace, en rognant l'image si nécessaire */
+}
+/* Corps de l'annonce */
+.annonce-body {
+    text-align: left;  /* Alignement à gauche du texte */
+    padding-left: 1vw;
+    padding-right: 1vw;   
+}
+
+/* Titre de l'annonce */
+.annonce-title {
+    font-size: 1.25rem;  /* Taille de police pour le titre */
+    margin: 10px 0;      /* Marges pour le titre */
+}
+
+/* Styles pour le nom de l'objet et le prix */
+.annonce-title a {
+    text-decoration: none; /* Supprimer le soulignement des liens */
+    color: blue;       /* Couleur du texte */
+    font-weight: bold; /* Mettre le nom en gras */
+}
+.annonce-title a:hover {
+    color: violet;       /* Couleur du texte au survol */
+}
+
+/* Texte non gras */
+.non-gras {
+    font-weight: normal; /* Texte normal pour la description */
+}
+
+/* Alignement du prix */
+.text-right {
+    text-align: right; /* Aligner le texte à droite */
+    padding-right: 1vw;   
+}
+.text-left{
+    padding-left: 1vw;
+}
+/* Pied de l'annonce */
+.annonce-footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* Espace entre la date et le numéro d'incrément */
+    font-size: 0.875rem; /* Taille de police réduite */
+}
