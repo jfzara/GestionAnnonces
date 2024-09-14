@@ -21,47 +21,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer les données du formulaire
     $courriel = trim($_POST['courriel']);
     $mot_de_passe = $_POST['mot_de_passe'];
-    $confirmation_mot_de_passe = $_POST['confirmation_mot_de_passe'];
 
-    // Vérification si les mots de passe correspondent
-    if ($mot_de_passe !== $confirmation_mot_de_passe) {
-        $_SESSION['error'] = "Les mots de passe ne correspondent pas.";
-    } else {
-        // Vérifier si l'utilisateur existe dans la base de données
-        $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE Courriel = ?");
-        $stmt->bind_param("s", $courriel);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    // Vérifier si l'utilisateur existe dans la base de données
+    $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE Courriel = ?");
+    $stmt->bind_param("s", $courriel);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
 
-            // Vérifier le mot de passe
-            if (password_verify($mot_de_passe, $user['MotDePasse'])) {
-                // Incrémenter le nombre de connexions
-                $stmt = $conn->prepare("UPDATE utilisateurs SET NbConnexions = NbConnexions + 1 WHERE NoUtilisateur = ?");
-                $stmt->bind_param("i", $user['NoUtilisateur']);
-                $stmt->execute();
+        // Vérifier le mot de passe
+        if (password_verify($mot_de_passe, $user['MotDePasse'])) {
+            // Incrémenter le nombre de connexions
+            $stmt = $conn->prepare("UPDATE utilisateurs SET NbConnexions = NbConnexions + 1 WHERE NoUtilisateur = ?");
+            $stmt->bind_param("i", $user['NoUtilisateur']);
+            $stmt->execute();
 
-                // Enregistrer la connexion dans la table connexions
-                $stmt = $conn->prepare("INSERT INTO connexions (NoUtilisateur) VALUES (?)");
-                $stmt->bind_param("i", $user['NoUtilisateur']);
-                $stmt->execute();
+            // Enregistrer la connexion dans la table connexions
+            $stmt = $conn->prepare("INSERT INTO connexions (NoUtilisateur) VALUES (?)");
+            $stmt->bind_param("i", $user['NoUtilisateur']);
+            $stmt->execute();
 
-                // Récupérer l'ID de la connexion pour l'utiliser lors de la déconnexion
-                $NoConnexion = $conn->insert_id;
-                $_SESSION['NoConnexion'] = $NoConnexion; // Stocker l'ID de la connexion dans la session
+            // Récupérer l'ID de la connexion pour l'utiliser lors de la déconnexion
+            $NoConnexion = $conn->insert_id;
+            $_SESSION['NoConnexion'] = $NoConnexion; // Stocker l'ID de la connexion dans la session
 
-                // Enregistrer l'ID de l'utilisateur dans la session
-                $_SESSION['NoUtilisateur'] = $user['NoUtilisateur'];
-                header('Location: dashboard.php'); // Rediriger vers le tableau de bord
-                exit();
-            } else {
-                $_SESSION['error'] = "Mot de passe incorrect.";
-            }
+            // Enregistrer l'ID de l'utilisateur dans la session
+            $_SESSION['NoUtilisateur'] = $user['NoUtilisateur'];
+            header('Location: dashboard.php'); // Rediriger vers le tableau de bord
+            exit();
         } else {
-            $_SESSION['error'] = "Aucun utilisateur trouvé avec cet e-mail.";
+            $_SESSION['error'] = "Mot de passe incorrect.";
         }
+    } else {
+        $_SESSION['error'] = "Aucun utilisateur trouvé avec cet e-mail.";
     }
 }
 
@@ -74,11 +68,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Connexion</title>
     <link rel="stylesheet" href="styles.css">
+    
     <script>
         function validateForm() {
             const email = document.getElementById('courriel').value;
             const password = document.getElementById('mot_de_passe').value;
-            const confirmPassword = document.getElementById('confirmation_mot_de_passe').value;
             let errorMessage = "";
 
             // Validation de l'adresse courriel
@@ -91,11 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{5,15}$/;
             if (!passwordPattern.test(password)) {
                 errorMessage += "Le mot de passe doit comporter entre 5 et 15 caractères, inclure des lettres (majuscules et minuscules) et des chiffres.<br>";
-            }
-
-            // Vérification si les mots de passe correspondent
-            if (password !== confirmPassword) {
-                errorMessage += "Les mots de passe ne correspondent pas.<br>";
             }
 
             // Afficher les erreurs si elles existent
@@ -111,31 +100,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 </head>
 <body>
-    
-
-    <div id="errorMessages" style="color:red;">
-        <?php
-        // Affichage des messages d'erreur
-        if (isset($_SESSION['error'])) {
-            echo $_SESSION['error'];
-            unset($_SESSION['error']);
-        }
-        ?>
-    </div>
-
-    <form action="login.php" method="POST" onsubmit="return validateForm();">
-    <p class="titre connexion">Connexion</p>
+ 
+    <form  class="loginform"  action="login.php" method="POST" onsubmit="return validateForm();">
+        <p class="titre connexion">Connexion</p>
         <label for="courriel">Courriel :</label>
         <input type="email" name="courriel" id="courriel" required>
         <br>
         <label for="mot_de_passe">Mot de passe :</label>
         <input type="password" name="mot_de_passe" id="mot_de_passe" required>
         <br>
+       
         <br>
-        <input class = "soumettre" type="submit" value="Se connecter">
-        <p><a class= "lien" href="enregistrement.php">Créer un compte</a></p>
+        <input class="soumettre" type="submit" value="Se connecter">
+
+        <div id="errorMessages" style="color:red;">
+            <?php
+            // Affichage des messages d'erreur
+            if (isset($_SESSION['error'])) {
+                echo $_SESSION['error'];
+                unset($_SESSION['error']);
+            }
+            ?>
+        </div>
+        <p><a class="lien_enregistrement" href="enregistrement.php">Créer un compte</a></p>
     </form>
     
-    
+ 
 </body>
 </html>

@@ -28,7 +28,7 @@ h1 {
 }
 
 /* Styles de formulaire */
-form {
+form  {
    
     display: flex;
     flex-direction: column;
@@ -40,9 +40,25 @@ form {
     min-width: 36%;
     padding-left: 1vw;
     padding-right: 3vw;
-    position: absolute;
+    position: relative;
     top: 0;
 }
+.loginform {
+   
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: #dfe0e4;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-width: 36%;
+    padding-left: 1vw;
+    padding-right: 3vw;
+    position: relative;
+    top: -31vh;
+}
+
 
 /* Classes pour les messages d'erreur et de succès */
 .success {
@@ -112,18 +128,20 @@ nav li  {
    font-weight: bold;     
 }
 
-nav a, .lien {
+nav a, .lien, .lien_enregistrement {
     text-decoration: underline ;      /* Supprimer le soulignement des liens */
     color: blue;                /* Couleur du texte */
     padding: 10px;              /* Espacement autour des liens */
     font-weight: bold;
     transition: background-color 0.3s ease, color 0.3s ease;  /* Transition fluide pour les effets */
+    cursor: pointer;
 }
 
-nav a:hover, .lien:hover {
+nav a:hover, .lien:hover, .lien_enregistrement:hover {
       /* Couleur de fond au survol */
     color: violet;                 /* Changer la couleur du texte au survol */
 }
+
 
 /* Style pour les messages d'erreur */
 .errors {

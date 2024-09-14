@@ -76,10 +76,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $token = bin2hex(random_bytes(16));
 
         // Insérer les données dans la base de données
-        $query = 'INSERT INTO utilisateurs (Courriel, MotDePasse, Nom, Prenom, Statut, Token, NoTelMaison, NoTelTravail, NoTelCellulaire) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)';
+        $query = "INSERT INTO utilisateurs (Courriel, MotDePasse, Nom, Prenom, Statut, Token, NoTelMaison, NoTelTravail, NoTelCellulaire)
+                  VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
+
+        // Lier uniquement les variables qui correspondent aux paramètres de la requête
         $stmt->bind_param("ssssssss", $courriel, $hashed_password, $nom, $prenom, $token, $noTelMaison, $noTelTravail, $noTelCellulaire);
-        
+
+        // Exécuter la requête
         if ($stmt->execute()) {
             // Envoi du courriel de confirmation à l'utilisateur
             $mail = new PHPMailer(true);
@@ -128,21 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<!-- Affichage des erreurs s'il y en a -->
-<?php if (isset($_SESSION['errors']) && !empty($_SESSION['errors'])): ?>
-        <div class="errors">
-            <?php foreach ($_SESSION['errors'] as $error): ?>
-                <p><?php echo htmlspecialchars($error); ?></p>
-            <?php endforeach; ?>
-        </div>
-        <?php unset($_SESSION['errors']); // Effacer les erreurs après les avoir affichées ?>
-    <?php endif; ?>
 
-    <!-- Affichage du message de succès -->
-    <?php if (isset($_SESSION['success'])): ?>
-        <p class="success"><?php echo htmlspecialchars($_SESSION['success']); ?></p>
-        <?php unset($_SESSION['success']); // Effacer le message après l'avoir affiché ?>
-    <?php endif; ?>
 
     <form class = "register_form" action="enregistrement.php" method="POST">
     <p class="titre">Inscription</p>
@@ -181,7 +171,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" name="noTelCellulaire" id="noTelCellulaire" required value="<?php echo isset($_POST['noTelCellulaire']) ? htmlspecialchars($_POST['noTelCellulaire']) : ''; ?>">
         <br>
         <button type="submit">S'inscrire</button>
-    </form>
     
+    <!-- Affichage des erreurs s'il y en a -->
+<?php if (isset($_SESSION['errors']) && !empty($_SESSION['errors'])): ?>
+        <div class="errors">
+            <?php foreach ($_SESSION['errors'] as $error): ?>
+                <p><?php echo htmlspecialchars($error); ?></p>
+            <?php endforeach; ?>
+        </div>
+        <?php unset($_SESSION['errors']); // Effacer les erreurs après les avoir affichées ?>
+    <?php endif; ?>
+
+    <!-- Affichage du message de succès -->
+    <?php if (isset($_SESSION['success'])): ?>
+        <p class="success"><?php echo htmlspecialchars($_SESSION['success']); ?></p>
+        <?php unset($_SESSION['success']); // Effacer le message après l'avoir affiché ?>
+    <?php endif; ?>
+
+    </form>
 </body>
 </html>
