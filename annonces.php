@@ -58,7 +58,12 @@ $total_pages = ceil($total / $limit); // Calculer le nombre total de pages
     <link rel="stylesheet" href="styles.css"> <!-- Lier votre fichier de style -->
 </head>
 <body>
-
+<nav class="navbar">
+    <a href="annonces.php" class="nav-item">Annonces</a>
+    <a href="gestion_annonces.php" class="nav-item">Gestion de vos annonces</a>
+    <a href="miseAJourProfil.php" class="nav-item">Modification du profil</a>
+    <a href="Deconnexion.php" class="nav-item">Déconnexion</a>
+</nav>
 <div id="divListe">
     <?php
     if ($result->num_rows > 0) {

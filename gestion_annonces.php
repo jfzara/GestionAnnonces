@@ -31,7 +31,19 @@ $result = $stmt->get_result();
 
 // Vérifiez si des annonces sont trouvées
 ?>
-
+<nav class="navbar">
+        <div class="container">
+            <div id="menu" class="navbar-collapse">
+                <div class="navbar-nav">
+                    <a href="annonces.php" class="nav-item">Annonces</a>
+                    <a href="gestion_annonces.php" class="nav-item">Gestion de vos annonces</a>
+                    <a href="miseAJourProfil.php" class="nav-item">Modification du profil</a>
+                    <a href="Deconnexion.php" class="nav-item">Déconnexion</a>
+                    <span class="user-email">(test@test.test)</span>
+                </div>
+            </div>
+        </div>
+    </nav>
 <div class="divGestion">
     <div class="text-right mx-3 my-2">
         <a href="ajouter_annonce.php" class="btn btn-primary text-light">Ajouter</a>

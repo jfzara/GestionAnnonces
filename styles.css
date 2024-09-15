@@ -1,3 +1,4 @@
+
 body {
     display: flex;
     flex-direction: column;
@@ -110,25 +111,43 @@ button:hover {
 
 /* Navigation */
 nav {
-    background-color: #f8f8f8; /* Couleur de fond */
-    padding: 10px;             /* Espacement interne */
+    background-color: #343a40;  /* Couleur de fond sombre */
+    padding: 10px;              /* Espacement interne */
+    display: flex;              /* Utiliser Flexbox */
+    justify-content: center;    /* Centrer les éléments horizontalement */
+    position: fixed;            /* Fixer le menu en haut de la page */
+    top: 0;                     /* Positionner le menu tout en haut */
+    left: 0;                    /* Alignement à gauche */
+    width: 100%;                /* Largeur complète de la page */
+    z-index: 1000;              /* Priorité sur d'autres éléments */
 }
 
-nav ul {
-    display: flex;             /* Utiliser Flexbox */
-    flex-direction: row;      /* Aligner les éléments en ligne */
-    list-style-type: none;    /* Supprimer les puces */
-    padding: 0;               /* Supprimer le padding par défaut */
-    margin: 0;                /* Supprimer la marge par défaut */
+/* Espacement des éléments à l'intérieur de la navigation */
+nav .navbar-nav {
+    display: flex;              /* Utiliser Flexbox pour aligner les liens */
 }
 
-nav li  {
-    margin: 0 15px; 
-            /* Espacement horizontal entre les éléments */
-   font-weight: bold;     
+/* Espacement entre chaque lien de navigation */
+nav .nav-item {
+    margin: 0 15px;             /* Espacement horizontal entre les éléments */
 }
 
-nav a, .lien, .lien_enregistrement {
+/* Style des liens */
+nav a {
+    text-decoration: none;      /* Supprimer le soulignement des liens */
+    color: white;               /* Couleur du texte en blanc */
+    padding: 10px;              /* Espacement autour des liens */
+    font-weight: bold;          /* Mettre le texte en gras */
+    transition: background-color 0.3s ease, color 0.3s ease;  /* Transition fluide pour les effets */
+    cursor: pointer;
+}
+
+/* Couleur des liens au survol */
+nav a:hover {
+    color: violet;              /* Couleur du texte au survol */
+}
+
+ .lien, .lien_enregistrement {
     text-decoration: underline ;      /* Supprimer le soulignement des liens */
     color: blue;                /* Couleur du texte */
     padding: 10px;              /* Espacement autour des liens */
@@ -137,7 +156,7 @@ nav a, .lien, .lien_enregistrement {
     cursor: pointer;
 }
 
-nav a:hover, .lien:hover, .lien_enregistrement:hover {
+ .lien:hover, .lien_enregistrement:hover {
       /* Couleur de fond au survol */
     color: violet;                 /* Changer la couleur du texte au survol */
 }

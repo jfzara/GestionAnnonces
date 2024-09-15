@@ -18,6 +18,7 @@ if (!isset($_SESSION['NoUtilisateur'])) {
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
     <div class="container">
         <h1>Bienvenue sur votre tableau de bord</h1>
 
