@@ -165,8 +165,8 @@ nav a:hover, .lien:hover, .lien_enregistrement:hover {
 #divListe {
     display: flex;          /* Utiliser Flexbox */
     flex-wrap: wrap;       /* Permettre aux cartes de revenir à la ligne */
-    justify-content: space-evenly;   /* Aligner les éléments à droite */
-    width: 100%;    
+    justify-content: space-between;   /* Aligner les éléments à droite */
+    width: 80%;    
  
 }
 
@@ -179,9 +179,7 @@ nav a:hover, .lien:hover, .lien_enregistrement:hover {
     border: 1px solid rgba(0, 0, 0, .125);
     border-radius: .25rem;
     background-color: #fff;
-  
-   width: 15vw; /* Largeur min de l'annonce */
-  
+   width: 13vw;  
     height: 400px;  /* Hauteur de l'annonce */
     margin: 20px;   /* Marges autour de chaque annonce */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre autour de l'annonce */
@@ -247,4 +245,30 @@ object-fit: cover;     /* Couvre tout l'espace, en rognant l'image si nécessair
     display: flex;
     justify-content: space-between; /* Espace entre la date et le numéro d'incrément */
     font-size: 0.875rem; /* Taille de police réduite */
+}
+
+/* Style pour la pagination */
+.pagination {
+    display: flex;            /* Utiliser Flexbox pour aligner les éléments */
+    justify-content: center;  /* Centrer les liens de pagination */
+    margin: 20px 0;         /* Espacement au-dessus et au-dessous de la pagination */
+}
+
+.pagination a {
+    padding: 10px 15px;      /* Espacement autour des liens */
+    margin: 0 5px;           /* Espacement entre les liens */
+    border: 1px solid #007bff; /* Bordure bleue */
+    border-radius: 5px;      /* Coins arrondis */
+    color: #007bff;          /* Couleur du texte */
+    text-decoration: none;    /* Supprimer le soulignement */
+}
+
+.pagination a.active {
+    background-color: #007bff; /* Couleur de fond pour le lien actif */
+    color: white;               /* Couleur du texte pour le lien actif */
+}
+
+.pagination a:hover {
+    background-color: #0056b3;  /* Couleur de fond au survol */
+    color: white;               /* Couleur du texte au survol */
 }

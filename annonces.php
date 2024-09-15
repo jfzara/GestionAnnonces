@@ -33,9 +33,21 @@ function getCategoryName($categoryNumber) {
     }
 }
 
-// Récupération des annonces
-$sql = "SELECT NoAnnonce, Categorie, DescriptionAbregee, DescriptionComplete, Prix, Photo, Parution FROM annonces";
+// Pagination
+$limit = 5; // Nombre d'annonces par page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Page actuelle
+$offset = ($page - 1) * $limit; // Décalage pour la requête SQL
+
+// Récupération des annonces avec pagination
+$sql = "SELECT NoAnnonce, Categorie, DescriptionAbregee, DescriptionComplete, Prix, Photo, Parution FROM annonces LIMIT $limit OFFSET $offset";
 $result = $conn->query($sql);
+
+// Récupérer le nombre total d'annonces pour la pagination
+$total_sql = "SELECT COUNT(*) as total FROM annonces";
+$total_result = $conn->query($total_sql);
+$total_row = $total_result->fetch_assoc();
+$total = $total_row['total'];
+$total_pages = ceil($total / $limit); // Calculer le nombre total de pages
 ?>
 
 <!DOCTYPE html>
@@ -47,11 +59,11 @@ $result = $conn->query($sql);
 </head>
 <body>
 
-<div id="divListe" >
+<div id="divListe">
     <?php
     if ($result->num_rows > 0) {
         // Compteur pour le numéro séquentiel
-        $sequentialNumber = 1;
+        $sequentialNumber = 1 + $offset; // Commencer à partir de l'offset
 
         // Affichage des annonces
         while ($row = $result->fetch_assoc()) {
@@ -79,7 +91,7 @@ $result = $conn->query($sql);
                 </div>
                 <div class="annonce-footer">
                     <div class="text-left"><?php echo $datePublication; ?></div>
-                    <div class="text-right"><?php echo $row['NoAnnonce']; ?></div> <!-- Numéro d'incrément -->
+                    <div class="text-right"><?php echo $row['NoAnnonce']; ?></div>
                 </div>
             </div>
             <?php
@@ -89,6 +101,20 @@ $result = $conn->query($sql);
     }
     $conn->close();
     ?>
+</div>
+
+<div class="pagination">
+    <?php if ($page > 1): ?>
+        <a href="?page=<?php echo $page - 1; ?>">Précédent</a>
+    <?php endif; ?>
+
+    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+        <a href="?page=<?php echo $i; ?>" <?php if ($i == $page) echo 'class="active"'; ?>><?php echo $i; ?></a>
+    <?php endfor; ?>
+
+    <?php if ($page < $total_pages): ?>
+        <a href="?page=<?php echo $page + 1; ?>">Suivant</a>
+    <?php endif; ?>
 </div>
 
 </body>

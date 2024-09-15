@@ -1,0 +1,130 @@
+[
+    {
+        "id": 1,
+        "type": "Location",
+        "titre": "Appartement à louer",
+        "prix": 1200,
+        "description": "Bel appartement de 2 chambres à proximité des transports en commun.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Appartement.jpg"
+    },
+    {
+        "id": 2,
+        "type": "Recherche",
+        "titre": "Recherche colocataire",
+        "prix": 0,
+        "description": "Je cherche un colocataire pour partager un appartement dans le centre-ville.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Colocation.jpg"
+    },
+    {
+        "id": 3,
+        "type": "À vendre",
+        "titre": "Vente de canapé",
+        "prix": 300,
+        "description": "Canapé en excellent état, couleur grise, à venir chercher sur place.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Canapé.jpg"
+    },
+    {
+        "id": 4,
+        "type": "À donner",
+        "titre": "Donne vêtements d'enfants",
+        "prix": 0,
+        "description": "Vêtements d'enfants en bon état, à venir chercher.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Vêtement.jpg"
+    },
+    {
+        "id": 5,
+        "type": "Service offert",
+        "titre": "Cours de guitare",
+        "prix": 25,
+        "description": "Cours de guitare pour tous niveaux, possibilité de cours en ligne.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Cours de guitare.jpg"
+    },
+    {
+        "id": 6,
+        "type": "Autre",
+        "titre": "Échange de livres",
+        "prix": 0,
+        "description": "Échange de livres entre passionnés, toutes genres confondus.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Tapis de yoga.jpg"
+    },
+    {
+        "id": 7,
+        "type": "Location",
+        "titre": "Bureau à louer",
+        "prix": 800,
+        "description": "Bureau lumineux dans un espace partagé, toutes commodités incluses.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Machine à café.jpg"
+    },
+    {
+        "id": 8,
+        "type": "Recherche",
+        "titre": "Recherche voiture à louer",
+        "prix": 0,
+        "description": "Je cherche une voiture à louer pour un mois.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Voiture.jpg"
+    },
+    {
+        "id": 9,
+        "type": "À vendre",
+        "titre": "Vente de vélo",
+        "prix": 150,
+        "description": "Vélo de montagne en très bon état, idéal pour les randonnées.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Vélo.jpg"
+    },
+    {
+        "id": 10,
+        "type": "À donner",
+        "titre": "Donne meubles",
+        "prix": 0,
+        "description": "Meubles à donner, y compris une table et des chaises.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Chaises de jardin.jpg"
+    },
+    {
+        "id": 11,
+        "type": "Service offert",
+        "titre": "Gardiennage d'animaux",
+        "prix": 20,
+        "description": "Gardiennage d'animaux pendant vos vacances, promenades incluses.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Garde d'enfants.jpg"
+    },
+    {
+        "id": 12,
+        "type": "Autre",
+        "titre": "Rendez-vous sportif",
+        "prix": 0,
+        "description": "Organise des rencontres de football chaque week-end.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Emploi.jpg"
+    },
+    {
+        "id": 13,
+        "type": "Location",
+        "titre": "Chambre à louer",
+        "prix": 600,
+        "description": "Chambre meublée dans un appartement partagé, proche de l'université.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Téléviseur.jpg"
+    },
+    {
+        "id": 14,
+        "type": "Recherche",
+        "titre": "Recherche emploi à temps partiel",
+        "prix": 0,
+        "description": "Étudiant cherche un emploi à temps partiel dans la restauration.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Cours de photographie.jpg"
+    },
+    {
+        "id": 15,
+        "type": "À vendre",
+        "titre": "Vente de matériel de camping",
+        "prix": 200,
+        "description": "Kit complet de camping, à venir chercher.",
+        "image": "C:\\wamp64\\www\\GestionAnnonces\\photos-annonces\\Matériel de camping.jpg"
+    }
+]
+
+
+
+
+
+
+
+
