@@ -42,56 +42,55 @@ $result = $stmt->get_result();
         <a href="modifier_profil.php">Modification du profil</a>
         <a href="Deconnexion.php">Déconnexion</a>
     </nav>
- 
-        <div class="text-right">
-            <a href="ajouter_annonce.php" class="btn btn-success">Ajouter une annonce</a>
-        </div>
 
-        <h2>Gestion des annonces</h2>
+    <div class="text-right">
+        <a href="ajouter_annonce.php" class="btn btn-success">Ajouter une annonce</a>
+    </div>
 
-        <div class="table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>Image</th>
-                <th>No Annonce</th>
-                <th>Description</th>
-                <th>Catégorie</th>
-                <th>Prix</th>
-                <th>Date de parution</th>
-                <th>État</th>
-                <th>Modifier</th>
-                <th>Retirer</th>
-                <th>Statut</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    echo "<tr>";
-                    echo "<td><img src='{$row['Photo']}' alt='Image' width='144'></td>";
-                    echo "<td>{$row['NoAnnonce']}</td>";
-                    echo "<td><a href='Annonce.php?id={$row['NoAnnonce']}'>{$row['DescriptionAbregee']}</a></td>";
-                    echo "<td>{$row['Categorie']}</td>";
-                    echo "<td>{$row['Prix']} $</td>";
-                    echo "<td>{$row['Parution']}</td>";
-                    echo "<td>{$row['Etat']}</td>";
-                    echo "<td><button class='btn btn-success' onclick='modifyAnnouncement({$row['NoAnnonce']})'>Modifier</button></td>";
-                    echo "<td><button class='btn btn-danger' onclick='confirmWithdrawal({$row['NoAnnonce']})'>Retirer</button></td>";
-                    echo "<td><button class='btn btn-secondary toggle-btn' data-state='desactiver' onclick='toggleStatus(this)'>Désactiver</button></td>";
-                    echo "</tr>";
+    <h2>Gestion des annonces</h2>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>No Annonce</th>
+                    <th>Description</th>
+                    <th>Catégorie</th>
+                    <th>Prix</th>
+                    <th>Date de parution</th>
+                    <th>État</th>
+                    <th colspan="3"></th>  <!-- Trois cellules vides pour les boutons -->
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<tr>";
+                        echo "<td><img src='{$row['Photo']}' alt='Image' width='144'></td>";
+                        echo "<td>{$row['NoAnnonce']}</td>";
+                        echo "<td><a href='Annonce.php?id={$row['NoAnnonce']}'>{$row['DescriptionAbregee']}</a></td>";
+                        echo "<td>{$row['Categorie']}</td>";
+                        echo "<td>{$row['Prix']} $</td>";
+                        echo "<td>{$row['Parution']}</td>";
+                        echo "<td>{$row['Etat']}</td>";
+                        // Chaque bouton dans sa propre cellule
+                        echo "<td><button class='btn btn-success' onclick='modifyAnnouncement({$row['NoAnnonce']})'>Modifier</button></td>";
+                        echo "<td><button class='btn btn-danger' onclick='confirmWithdrawal({$row['NoAnnonce']})'>Retirer</button></td>";
+                        echo "<td><button class='btn btn-secondary toggle-btn' data-state='desactiver' onclick='toggleStatus(this)'>Désactiver</button></td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='10' class='text-center'>Aucune annonce trouvée.</td></tr>";
                 }
-            } else {
-                echo "<tr><td colspan='10' class='text-center'>Aucune annonce trouvée.</td></tr>";
-            }
-            // Fermer la connexion
-            $stmt->close();
-            $conn->close();
-            ?>
-        </tbody>
-    </table>
-</div>
+                // Fermer la connexion
+                $stmt->close();
+                $conn->close();
+                ?>
+            </tbody>
+        </table>
+    </div>
 
     <script>
     function toggleStatus(button) {
@@ -101,9 +100,11 @@ $result = $stmt->get_result();
         if (currentState === 'desactiver') {
             button.innerText = 'Activer';
             button.setAttribute('data-state', 'activer');
+            button.classList.remove('désactiver'); // Retire la classe grise
         } else {
             button.innerText = 'Désactiver';
             button.setAttribute('data-state', 'desactiver');
+            button.classList.add('désactiver'); // Ajoute la classe grise
         }
     }
 
