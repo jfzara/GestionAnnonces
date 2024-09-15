@@ -64,31 +64,35 @@ $result = $stmt->get_result();
                 </tr>
             </thead>
             <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td><img src='{$row['Photo']}' alt='Image' width='144'></td>";
-                        echo "<td>{$row['NoAnnonce']}</td>";
-                        echo "<td><a href='Annonce.php?id={$row['NoAnnonce']}'>{$row['DescriptionAbregee']}</a></td>";
-                        echo "<td>{$row['Categorie']}</td>";
-                        echo "<td>{$row['Prix']} $</td>";
-                        echo "<td>{$row['Parution']}</td>";
-                        echo "<td>{$row['Etat']}</td>";
-                        // Chaque bouton dans sa propre cellule
-                        echo "<td><button class='btn btn-success' onclick='modifyAnnouncement({$row['NoAnnonce']})'>Modifier</button></td>";
-                        echo "<td><button class='btn btn-danger' onclick='confirmWithdrawal({$row['NoAnnonce']})'>Retirer</button></td>";
-                        echo "<td><button class='btn btn-secondary toggle-btn' data-state='desactiver' onclick='toggleStatus(this)'>Désactiver</button></td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='10' class='text-center'>Aucune annonce trouvée.</td></tr>";
-                }
-                // Fermer la connexion
-                $stmt->close();
-                $conn->close();
-                ?>
-            </tbody>
+    <?php
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            echo "<tr>";
+            
+            // Vérifier si l'image est définie, sinon utiliser une image par défaut
+            $photoSrc = !empty($row['Photo']) ? $row['Photo'] : 'photos-annonces/default.jpg'; // Mettez le chemin de votre image par défaut ici
+            echo "<td><img src='{$photoSrc}' alt='Image' width='144'></td>";
+            
+            echo "<td>{$row['NoAnnonce']}</td>";
+            echo "<td><a href='Annonce.php?id={$row['NoAnnonce']}'>{$row['DescriptionAbregee']}</a></td>";
+            echo "<td>{$row['Categorie']}</td>";
+            echo "<td>{$row['Prix']} $</td>";
+            echo "<td>{$row['Parution']}</td>";
+            echo "<td>{$row['Etat']}</td>";
+            // Chaque bouton dans sa propre cellule
+            echo "<td><button class='btn btn-success' onclick='modifyAnnouncement({$row['NoAnnonce']})'>Modifier</button></td>";
+            echo "<td><button class='btn btn-danger' onclick='confirmWithdrawal({$row['NoAnnonce']})'>Retirer</button></td>";
+            echo "<td><button class='btn btn-secondary toggle-btn' data-state='desactiver' onclick='toggleStatus(this)'>Désactiver</button></td>";
+            echo "</tr>";
+        }
+    } else {
+        echo "<tr><td colspan='10' class='text-center'>Aucune annonce trouvée.</td></tr>";
+    }
+    // Fermer la connexion
+    $stmt->close();
+    $conn->close();
+    ?>
+</tbody>
         </table>
     </div>
 
