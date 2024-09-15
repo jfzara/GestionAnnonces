@@ -1,6 +1,15 @@
 <?php
 // Inclure la connexion à la base de données
 include 'db.php';
+session_start(); // Assurez-vous que la session est démarrée
+
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['NoUtilisateur'])) {
+    die("Accès non autorisé. Veuillez vous connecter.");
+}
+
+// Récupérer l'ID de l'utilisateur connecté
+$noUtilisateur = $_SESSION['NoUtilisateur'];
 
 // Vérifier si le formulaire a été soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -11,52 +20,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $prix = $_POST['tbPrixAnnonce'];
     $active = $_POST['Activation'];
 
-   // Gestion de l'upload d'image
-$targetDir = "photos-annonces/";
-$targetFile = $targetDir . basename($_FILES["fileToUpload"]["name"]);
-$uploadOk = 1;
-$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+    // Gestion de l'upload d'image
+    $targetDir = "photos-annonces/";
+    $targetFile = $targetDir . basename($_FILES["fileToUpload"]["name"]);
+    $uploadOk = 1;
+    $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-// Vérifier si le fichier est une image
-$check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-if ($check === false) {
-    echo "Ce fichier n'est pas une image.";
-    $uploadOk = 0;
-}
-
-// Vérifier la taille du fichier
-if ($_FILES["fileToUpload"]["size"] > 100000) {
-    echo "Désolé, votre fichier est trop volumineux.";
-    $uploadOk = 0;
-}
-
-// Autoriser certains formats de fichiers
-if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-    echo "Désolé, seuls les fichiers JPG, JPEG, PNG et GIF sont autorisés.";
-    $uploadOk = 0;
-}
-
-// Télécharger l'image si tout est correct
-if ($uploadOk == 1 && move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetFile)) {
-    echo "Le fichier " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " a été téléchargé. ";
-} else {
-    echo "Désolé, une erreur est survenue lors du téléchargement de votre fichier.";
-    $targetFile = ""; // Mettre à jour si le fichier n'a pas été téléchargé
-}
-
-// Insérer les données dans la base de données
-if ($uploadOk == 1) {
-    try {
-        $query = "INSERT INTO annonces (Categorie, DescriptionAbregee, DescriptionComplete, Prix, Photo, Etat) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("issdsi", $categorie, $petiteDesc, $grosseDesc, $prix, $targetFile, $active);
-        $stmt->execute();
-
-        echo "Annonce ajoutée avec succès !";
-    } catch (mysqli_sql_exception $e) {
-        echo "Erreur lors de l'insertion : " . $e->getMessage();
+    // Vérifier si le fichier est une image
+    $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+    if ($check === false) {
+        echo "Ce fichier n'est pas une image.";
+        $uploadOk = 0;
     }
-  }
+
+    // Vérifier la taille du fichier
+    if ($_FILES["fileToUpload"]["size"] > 100000) {
+        echo "Désolé, votre fichier est trop volumineux.";
+        $uploadOk = 0;
+    }
+
+    // Autoriser certains formats de fichiers
+    if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+        echo "Désolé, seuls les fichiers JPG, JPEG, PNG et GIF sont autorisés.";
+        $uploadOk = 0;
+    }
+
+    // Télécharger l'image si tout est correct
+    if ($uploadOk == 1 && move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetFile)) {
+        echo "Le fichier " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " a été téléchargé. ";
+    } else {
+        echo "Désolé, une erreur est survenue lors du téléchargement de votre fichier.";
+        $targetFile = ""; // Mettre à jour si le fichier n'a pas été téléchargé
+    }
+
+    // Insérer les données dans la base de données
+    if ($uploadOk == 1) {
+        try {
+            $query = "INSERT INTO annonces (NoUtilisateur, Categorie, DescriptionAbregee, DescriptionComplete, Prix, Photo, Etat) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("iissdsi", $noUtilisateur, $categorie, $petiteDesc, $grosseDesc, $prix, $targetFile, $active);
+            $stmt->execute();
+
+            echo "Annonce ajoutée avec succès !";
+        } catch (mysqli_sql_exception $e) {
+            echo "Erreur lors de l'insertion : " . $e->getMessage();
+        }
+    }
 }
 ?>
 
@@ -67,7 +76,6 @@ if ($uploadOk == 1) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajouter une annonce</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-   
 </head>
 <body>
 <div class="container col-md-5 jumbotron">
