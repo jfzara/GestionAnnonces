@@ -64,6 +64,86 @@ $total_pages = ceil($total / $limit); // Calculer le nombre total de pages
     <a href="modifier_profil.php" class="nav-item">Modification du profil</a>
     <a href="Deconnexion.php" class="nav-item">Déconnexion</a>
 </nav>
+<div id="divRecherche" style="width: 90%; display: flex; justify-content: space-between; padding: 10px;position: relative;
+    top: -13vh;">
+    <!-- Eléments par page -->
+    <div id="divNbParPage" style="flex: 1; display: flex; flex-direction: column; align-items: flex-start;">
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <label style="margin-right: 10px;">Éléments par page :</label>
+            <select id="ddlNbParPage" style="width: 60px; padding: 5px;">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+            </select>
+        </div>
+        <h5 style="color: gray; font-style: italic;">12 annonces trouvées.</h5>
+    </div>
+
+    <!-- Espace vide au milieu -->
+    <div style="flex: 1;"></div>
+
+    <!-- Recherche simple -->
+    <div id="divRechercheSimple" style="flex: 2; display: flex; flex-direction: column; align-items: flex-end;">
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <label style="margin-right: 10px;">Ordre :</label>
+            <select id="TypeOrdre" name="TypeOrdre" style="padding: 5px; margin-right: 10px;">
+                <option value="Date">Date</option>
+                <option value="Auteur">Auteur</option>
+                <option value="Categorie">Catégorie</option>
+            </select>
+            <select id="Ordre" name="Ordre" style="padding: 5px; margin-right: 2vw;">
+                <option value="ASC">▲</option>
+                <option value="DESC">▼</option>
+            </select>
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <input type="text" id="Description" name="Description" placeholder="Recherche..." style="padding: 5px; margin-right: 10px; margin-top: 1vh;">
+        </div>
+        </div>
+        
+        <div style="display: flex; align-items: center;">
+            <input type="submit" value="Rechercher" style="margin-right: 10px; background-color: #007bff; color: white; font-weight: bold;">
+            <button id="btnAfficherAvance" type="button" onclick="toggleRechercheAvance();" style="font-weight: bold; background-color: gray; font-size: 1rem;">+</button>
+        </div>
+    </div>
+</div>
+
+<!-- Recherche avancée (masquée par défaut) -->
+<div id="divRechercheAvancé" style="margin-top: 10px; padding: 10px; border: 1px solid #000; display: none;">
+    <div style="margin-bottom: 10px;">
+        <label for="Auteur" style="width: 100px; display: inline-block;">Auteur :</label>
+        <input type="text" id="Auteur" name="Auteur" value="">
+    </div>
+    <div style="margin-bottom: 10px;">
+        <label for="Categorie" style="width: 100px; display: inline-block;">Catégorie :</label>
+        <select id="Categorie" name="Categorie">
+            <option value="">Toutes</option>
+            <option value="1">Location</option>
+            <option value="2">Recherche</option>
+            <option value="3">À vendre</option>
+            <option value="4">À donner</option>
+            <option value="5">Service offert</option>
+            <option value="6">Autre</option>
+        </select>
+    </div>
+    <div style="margin-bottom: 10px;">
+        <label for="DateDebut" style="width: 100px; display: inline-block;">Date :</label>
+        <input type="date" id="DateDebut" name="DateDebut">
+        <span>à</span>
+        <input type="date" id="DateFin" name="DateFin">
+    </div>
+</div>
+
+<script>
+    function toggleRechercheAvance() {
+        var rechercheAvance = document.getElementById("divRechercheAvancé");
+        if (rechercheAvance.style.display === "none") {
+            rechercheAvance.style.display = "block";
+        } else {
+            rechercheAvance.style.display = "none";
+        }
+    }
+</script>
 <div id="divListe">
     <?php
     if ($result->num_rows > 0) {
@@ -80,8 +160,8 @@ $total_pages = ceil($total / $limit); // Calculer le nombre total de pages
                     <div class="text-left"><?php echo $sequentialNumber++; ?></div>
                     <div class="text-right"><?php echo getCategoryName($row['Categorie']); ?></div>
                 </div>
-                <div class="annonce-image">
-                    <img alt="Image de <?php echo $row['DescriptionAbregee']; ?>" src="<?php echo $photoUrl; ?>" width="144" class="m-auto" style="height: auto;">
+                <div class="annonce-image" >
+                    <img alt="Image de <?php echo $row['DescriptionAbregee']; ?>" src="<?php echo $photoUrl; ?>" >
                 </div>
                 <div class="annonce-body">
                     <h6 class="annonce-title">
@@ -108,18 +188,25 @@ $total_pages = ceil($total / $limit); // Calculer le nombre total de pages
     ?>
 </div>
 
-<div class="pagination">
-    <?php if ($page > 1): ?>
-        <a href="?page=<?php echo $page - 1; ?>">Précédent</a>
-    <?php endif; ?>
+<div id="divPages" class="pagination-container m-auto text-center">
+    <a class="pagination-arrow" href="?page=1" style="color: black; font-weight: bold; text-decoration: none;" onmouseover="this.style.color='blue'" onmouseout="this.style.color='black'">&lt;&lt;</a>
+    <a class="pagination-arrow" href="?page=1" style="color: gray; font-weight: bolder; text-decoration: none;" onmouseover="this.style.color='blue'" onmouseout="this.style.color='gray'">&lt;</a>
 
-    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-        <a href="?page=<?php echo $i; ?>" <?php if ($i == $page) echo 'class="active"'; ?>><?php echo $i; ?></a>
-    <?php endfor; ?>
+    <select id="ddlPage" class="pagination-select" onchange="location = this.value;">
+        <option value="?page=1" selected="">1</option>
+        <option value="?page=2">2</option>
+        <option value="?page=3">3</option>
+        <option value="?page=4">4</option>
+        <option value="?page=5">5</option>
+        <option value="?page=6">6</option>
+        <option value="?page=7">7</option>
+        <option value="?page=8">8</option>
+        <option value="?page=9">9</option>
+        <option value="?page=10">10</option>
+    </select>
 
-    <?php if ($page < $total_pages): ?>
-        <a href="?page=<?php echo $page + 1; ?>">Suivant</a>
-    <?php endif; ?>
+    <a class="pagination-arrow" href="?page=2" style="color: gray; font-weight: bold; text-decoration: none;" onmouseover="this.style.color='blue'" onmouseout="this.style.color='gray'">&gt;</a>
+    <a class="pagination-arrow" href="?page=10" style="color: black; font-weight: bolder; text-decoration: none;" onmouseover="this.style.color='blue'" onmouseout="this.style.color='black'">&gt;&gt;</a>
 </div>
 
 </body>

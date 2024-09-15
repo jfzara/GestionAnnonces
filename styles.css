@@ -1,14 +1,12 @@
-
 body {
     display: flex;
     flex-direction: column;
-    justify-content: center;   /* Centrer horizontalement */
-    align-items: center;       /* Centrer verticalement */
-    min-height: 100vh;        /* Prendre toute la hauteur de la fenêtre */
-    margin: 0;                /* Supprimer la marge par défaut */
+    justify-content: center; /* Centrer horizontalement */
+    align-items: center;     /* Centrer verticalement */
+    min-height: 100vh;      /* Prendre toute la hauteur de la fenêtre */
+    margin: 0;              /* Supprimer la marge par défaut */
     font-family: Arial, sans-serif; /* Police de caractères */
-   /*  background-color: #f4f4f4; Couleur de fond */
- 
+    /* background-color: #f4f4f4; Couleur de fond */
 }
 
 /* Titres */
@@ -19,18 +17,16 @@ h1 {
 
 /* Conteneur pour centrer le contenu */
 .container {
-  
-    text-align: center;        /* Centrer le texte à l'intérieur du conteneur */
-    padding: 30px;            /* Espacement interne du conteneur */
-    border: 1px solid #ddd;   /* Bordure autour du conteneur */
-    border-radius: 10px;      /* Coins arrondis pour le conteneur */
+    text-align: center;    /* Centrer le texte à l'intérieur du conteneur */
+    padding: 30px;        /* Espacement interne du conteneur */
+    border: 1px solid #ddd; /* Bordure autour du conteneur */
+    border-radius: 10px;  /* Coins arrondis pour le conteneur */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre autour du conteneur */
-    max-width: 400px;        /* Largeur maximale du conteneur */
+    max-width: 400px;     /* Largeur maximale du conteneur */
 }
 
 /* Styles de formulaire */
-form  {
-   
+form, .loginform {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -41,31 +37,20 @@ form  {
     min-width: 36%;
     padding-left: 1vw;
     padding-right: 3vw;
-    position: relative;
-    top: 0;
 }
-.loginform  {
-   
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    background: #dfe0e4;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    min-width: 36%;
-    padding-left: 1vw;
-    padding-right: 3vw;
+
+/* Ajustement spécifique pour .loginform */
+.loginform {
     position: relative;
     top: -31vh;
 }
-
 
 /* Classes pour les messages d'erreur et de succès */
 .success {
     color: green;  
     margin-top: 10px;  
 }
+
 .error {
     color: red;  
     margin-top: 10px;  
@@ -76,7 +61,7 @@ label {
     display: block;
     margin: 10px 0 5px;
     font-weight: bold;   
-    color: #353535;     /* Mettre les étiquettes en gras */
+    color: #353535; /* Mettre les étiquettes en gras */
 }
 
 input {
@@ -89,8 +74,8 @@ input {
 }
 
 input:focus {
-    border-color: #007bff;    /* Couleur de la bordure au focus */
-    outline: none;             /* Supprimer le contour par défaut */
+    border-color: #007bff; /* Couleur de la bordure au focus */
+    outline: none;         /* Supprimer le contour par défaut */
 }
 
 /* Bouton */
@@ -101,13 +86,14 @@ button, .soumettre {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    width: 100%;               /* Bouton prend toute la largeur */
+    width: 100%; /* Bouton prend toute la largeur */
     transition: background-color 0.3s; /* Transition pour le changement de couleur */
 }
 
 button:hover {
     background-color: #0056b3;
 }
+
 /* Styles généraux pour les boutons personnalisés */
 button.modifier-btn,
 button.retirer-btn,
@@ -120,17 +106,15 @@ button.desactiver-btn {
     transition: background-color 0.3s; /* Transition pour le changement de couleur */
 }
 
-/* Bouton Modifier */
+/* Couleurs des boutons */
 button.modifier-btn {
     background-color: #28a745;   /* Couleur verte pour le bouton Modifier */
 }
 
-/* Bouton Retirer */
 button.retirer-btn {
     background-color: #dc3545;   /* Couleur rouge pour le bouton Retirer */
 }
 
-/* Bouton Désactiver */
 button.desactiver-btn {
     background-color: rgb(135, 175, 235);   /* Couleur jaune pour le bouton Désactiver */
 }
@@ -155,17 +139,18 @@ button.desactiver-btn {
     height: auto;                 /* Hauteur automatique pour ajuster au texte */
     padding: 5px 10px;           /* Ajustement des espacements */
 }
+
 /* Navigation */
 nav {
-    background-color: #343a40;  /* Couleur de fond sombre */
-    padding: 10px;              /* Espacement interne */
-    display: flex;              /* Utiliser Flexbox */
-    justify-content: center;    /* Centrer les éléments horizontalement */
-    position: fixed;            /* Fixer le menu en haut de la page */
-    top: 0;                     /* Positionner le menu tout en haut */
-    left: 0;                    /* Alignement à gauche */
-    width: 100%;                /* Largeur complète de la page */
-    z-index: 1000;              /* Priorité sur d'autres éléments */
+    background-color: #343a40; /* Couleur de fond sombre */
+    padding: 10px;             /* Espacement interne */
+    display: flex;             /* Utiliser Flexbox */
+    justify-content: center;   /* Centrer les éléments horizontalement */
+    position: fixed;           /* Fixer le menu en haut de la page */
+    top: 0;                    /* Positionner le menu tout en haut */
+    left: 0;                   /* Alignement à gauche */
+    width: 100%;               /* Largeur complète de la page */
+    z-index: 1000;             /* Priorité sur d'autres éléments */
 }
 
 /* Espacement des éléments à l'intérieur de la navigation */
@@ -175,7 +160,7 @@ nav .navbar-nav {
 
 /* Espacement entre chaque lien de navigation */
 nav .nav-item {
-    margin: 0 15px;             /* Espacement horizontal entre les éléments */
+    margin: 0 15px;            /* Espacement horizontal entre les éléments */
 }
 
 /* Style des liens */
@@ -184,7 +169,7 @@ nav a {
     color: white;               /* Couleur du texte en blanc */
     padding: 10px;              /* Espacement autour des liens */
     font-weight: bold;          /* Mettre le texte en gras */
-    transition: background-color 0.3s ease, color 0.3s ease;  /* Transition fluide pour les effets */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transition fluide pour les effets */
     cursor: pointer;
 }
 
@@ -193,20 +178,18 @@ nav a:hover {
     color: violet;              /* Couleur du texte au survol */
 }
 
- .lien, .lien_enregistrement {
-    text-decoration: underline ;      /* Supprimer le soulignement des liens */
-    color: blue;                /* Couleur du texte */
-    padding: 10px;              /* Espacement autour des liens */
+.lien, .lien_enregistrement {
+    text-decoration: underline; /* Souligner les liens */
+    color: blue;               /* Couleur du texte */
+    padding: 10px;             /* Espacement autour des liens */
     font-weight: bold;
-    transition: background-color 0.3s ease, color 0.3s ease;  /* Transition fluide pour les effets */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transition fluide pour les effets */
     cursor: pointer;
 }
 
- .lien:hover, .lien_enregistrement:hover {
-      /* Couleur de fond au survol */
-    color: violet;                 /* Changer la couleur du texte au survol */
+.lien:hover, .lien_enregistrement:hover {
+    color: violet;             /* Changer la couleur du texte au survol */
 }
-
 
 /* Style pour les messages d'erreur */
 .errors {
@@ -220,21 +203,18 @@ nav a:hover {
     font-weight: bold;
 }
 
-.titre{
+.titre {
     font-size: 2rem;
     font-weight: bold;
 }
 
 /* Style global pour les annonces */
-/* Style pour le conteneur de la liste d'annonces */
 #divListe {
-    display: flex;          /* Utiliser Flexbox */
-    flex-wrap: wrap;       /* Permettre aux cartes de revenir à la ligne */
-    justify-content: space-between;   /* Aligner les éléments à droite */
+    display: flex;             /* Utiliser Flexbox */
+    flex-wrap: wrap;          /* Permettre aux cartes de revenir à la ligne */
+    justify-content: space-between; /* Aligner les éléments à droite */
     width: 80%;    
- 
 }
-
 
 .annonce {
     display: flex;
@@ -244,11 +224,11 @@ nav a:hover {
     border: 1px solid rgba(0, 0, 0, .125);
     border-radius: .25rem;
     background-color: #fff;
-   width: 13vw;  
-    height: 400px;  /* Hauteur de l'annonce */
-    margin: 20px;   /* Marges autour de chaque annonce */
+    width: 13vw;  
+    height: 400px;          /* Hauteur de l'annonce */
+    margin: 20px;          /* Marges autour de chaque annonce */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre autour de l'annonce */
-    padding: 0; /* Supprimer le padding */
+    padding: 0;            /* Supprimer le padding */
 }
 
 /* En-tête de l'annonce et pied de l'annonce */
@@ -256,107 +236,31 @@ nav a:hover {
 .annonce-footer {
     background-color: #f0f0f0; /* Couleur de fond gris très clair */
     border-radius: 5px;      /* Coins arrondis */
-    width: 100%;   
-  
-             /* Largeur complète */
+    width: 100%;              /* Largeur complète */
 }
 
 /* Image de l'annonce */
-.annonce-image {
-    overflow: hidden;  /* Pour éviter les débordements d'images */
-width: 100%;           /* L'image prendra toute la largeur */
-height: 200px;            /* L'image prendra toute la hauteur */
-object-fit: cover;     /* Couvre tout l'espace, en rognant l'image si nécessaire */
+.annonce-image, img {
+    overflow: hidden;  
+    width: 100%;             /* L'image prendra toute la largeur */
+    height: 200px;           /* L'image prendra toute la hauteur */
+    object-fit: cover;       /* Couvre tout l'espace, en rognant l'image si nécessaire */
 }
+
 /* Corps de l'annonce */
 .annonce-body {
-    text-align: left;  /* Alignement à gauche du texte */
+    text-align: left;        /* Alignement à gauche du texte */
     padding-left: 1vw;
     padding-right: 1vw;   
 }
 
 /* Titre de l'annonce */
 .annonce-title {
-    font-size: 1.25rem;  /* Taille de police pour le titre */
-    margin: 10px 0;      /* Marges pour le titre */
+    font-size: 1.5rem;       /* Taille de la police */
+    font-weight: bold;       /* Mettre le texte en gras */
 }
 
-/* Styles pour le nom de l'objet et le prix */
-.annonce-title a {
-    text-decoration: none; /* Supprimer le soulignement des liens */
-    color: blue;       /* Couleur du texte */
-    font-weight: bold; /* Mettre le nom en gras */
-}
-.annonce-title a:hover {
-    color: violet;       /* Couleur du texte au survol */
-}
-
-/* Texte non gras */
-.non-gras {
-    font-weight: normal; /* Texte normal pour la description */
-}
-
-/* Alignement du prix */
-.text-right {
-    text-align: right; /* Aligner le texte à droite */
-    padding-right: 1vw;   
-}
-.text-left{
-    padding-left: 1vw;
-}
-/* Pied de l'annonce */
-.annonce-footer {
-    width: 100%;
-    display: flex;
-    justify-content: space-between; /* Espace entre la date et le numéro d'incrément */
-    font-size: 0.875rem; /* Taille de police réduite */
-}
-
-/* Style pour la pagination */
-.pagination {
-    display: flex;            /* Utiliser Flexbox pour aligner les éléments */
-    justify-content: center;  /* Centrer les liens de pagination */
-    margin: 20px 0;         /* Espacement au-dessus et au-dessous de la pagination */
-}
-
-.pagination a {
-    padding: 10px 15px;      /* Espacement autour des liens */
-    margin: 0 5px;           /* Espacement entre les liens */
-    border: 1px solid #007bff; /* Bordure bleue */
-    border-radius: 5px;      /* Coins arrondis */
-    color: #007bff;          /* Couleur du texte */
-    text-decoration: none;    /* Supprimer le soulignement */
-}
-
-.pagination a.active {
-    background-color: #007bff; /* Couleur de fond pour le lien actif */
-    color: white;               /* Couleur du texte pour le lien actif */
-}
-
-.pagination a:hover {
-    background-color: #0056b3;  /* Couleur de fond au survol */
-    color: white;               /* Couleur du texte au survol */
-}
-____________________
-.table-container {
-    width: 100%; /* Assurez-vous que le conteneur du tableau prend 100% de la largeur */
-    overflow-x: auto; /* Permet le défilement horizontal si nécessaire */
-}
-
-table {
-    width: 100%; /* Assurez-vous que le tableau prend 100% de la largeur de son conteneur */
-    border-collapse: collapse; /* Supprime les espaces entre les cellules */
-    table-layout: fixed; /* Cela permet de répartir l'espace de manière égale entre les colonnes */
-}
-
-th, td {
-    padding: 10px; /* Espacement dans les cellules */
-    text-align: left; /* Alignement à gauche */
-    border-bottom: 1px solid #dee2e6; /* Bordure inférieure */
-    word-wrap: break-word; /* Permet de gérer le texte long dans les cellules */
-}
-
-th {
-    background-color: #f8f9fa; /* Couleur d'arrière-plan des en-têtes */
-    color: #343a40; /* Couleur du texte des en-têtes */
+/* Boutons d'action pour chaque annonce */
+.annonce-action {
+    margin-top: auto; /* Espacement en haut */
 }
