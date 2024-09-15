@@ -291,3 +291,26 @@ object-fit: cover;     /* Couvre tout l'espace, en rognant l'image si nécessair
     background-color: #0056b3;  /* Couleur de fond au survol */
     color: white;               /* Couleur du texte au survol */
 }
+____________________
+.table-container {
+    width: 100%; /* Assurez-vous que le conteneur du tableau prend 100% de la largeur */
+    overflow-x: auto; /* Permet le défilement horizontal si nécessaire */
+}
+
+table {
+    width: 100%; /* Assurez-vous que le tableau prend 100% de la largeur de son conteneur */
+    border-collapse: collapse; /* Supprime les espaces entre les cellules */
+    table-layout: fixed; /* Cela permet de répartir l'espace de manière égale entre les colonnes */
+}
+
+th, td {
+    padding: 10px; /* Espacement dans les cellules */
+    text-align: left; /* Alignement à gauche */
+    border-bottom: 1px solid #dee2e6; /* Bordure inférieure */
+    word-wrap: break-word; /* Permet de gérer le texte long dans les cellules */
+}
+
+th {
+    background-color: #f8f9fa; /* Couleur d'arrière-plan des en-têtes */
+    color: #343a40; /* Couleur du texte des en-têtes */
+}
