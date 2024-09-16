@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("i", $user['NoUtilisateur']);
             $stmt->execute();
 
-            // Récupérer l'ID de la connexion pour l'utiliser lors de la déconnexion
+            // Récupérer l'ID de la connexion
             $NoConnexion = $conn->insert_id;
             $_SESSION['NoConnexion'] = $NoConnexion; // Stocker l'ID de la connexion dans la session
 
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="titre connexion">Connexion</p>
         <label for="courriel">Courriel :</label>
         <input type="email" name="courriel" id="courriel" required oninput="checkAdminEmail();">
-        <span id="adminIndicator" style="color: green; font-weight: bold; padding; 1rem;padding-inline: rem;  display: none; margin-left: 10px; background: white; border-radius: 5px;">ADMIN</span>
+        <span id="adminIndicator" style="color: green; font-weight: bold; display: none; margin-left: 10px; background: white; border-radius: 5px;">ADMIN</span>
         <br>
         <label for="mot_de_passe">Mot de passe :</label>
         <input type="password" name="mot_de_passe" id="mot_de_passe" required>

@@ -143,6 +143,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php unset($_SESSION['success']); ?>
 <?php endif; ?>
 
+<!-- Affichage des messages d'erreur -->
+<?php if (isset($_SESSION['errors'])): ?>
+    <div class="alert alert-danger">
+        <?php foreach ($_SESSION['errors'] as $error): ?>
+            <p><?php echo $error; ?></p>
+        <?php endforeach; ?>
+    </div>
+    <?php unset($_SESSION['errors']); ?>
+<?php endif; ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -150,40 +160,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        function toggleAdminCheckbox() {
+            const emailInput = document.getElementById('email1').value;
+            const adminCheckbox = document.getElementById('adminSection');
+            if (emailInput === 'admin@gmail.com') {
+                adminCheckbox.style.display = 'block'; // Afficher la section admin
+            } else {
+                adminCheckbox.style.display = 'none'; // Masquer la section admin
+                document.getElementById('isAdmin').checked = false; // Désélectionner le checkbox si visible
+            }
+        }
+    </script>
 </head>
 <body>
 
-    <form class="register_form" action="enregistrement.php" method="POST">
+    <form class="register_form" action="enregistrement.php" method="POST" onsubmit="toggleAdminCheckbox();">
         <p class="titre">Inscription</p>
         <label for="email1">Courriel :</label>
-        <input type="email" name="courriel" id="email1" required value="<?php echo isset($_POST['courriel']) ? htmlspecialchars($_POST['courriel']) : ''; ?>">
-        <br>
+        <input type="email" name="courriel" id="email1" required oninput="toggleAdminCheckbox();" value="<?php echo isset($courriel) ? $courriel : ''; ?>">
+
         <label for="password1">Mot de passe :</label>
         <input type="password" name="password1" id="password1" required>
-        <br>
-        <label for="password2">Confirmer le mot de passe :</label>
-        <input type="password" name="password2" id="password2" required>
-        <br>
-        <label for="nom">Nom :</label>
-        <input type="text" name="nom" id="nom" required value="<?php echo isset($_POST['nom']) ? htmlspecialchars($_POST['nom']) : ''; ?>">
-        <br>
-        <label for="prenom">Prénom :</label>
-        <input type="text" name="prenom" id="prenom" required value="<?php echo isset($_POST['prenom']) ? htmlspecialchars($_POST['prenom']) : ''; ?>">
-        <br>
-        <label for="noTelMaison">Téléphone Maison :</label>
-        <input type="text" name="noTelMaison" id="noTelMaison" required value="<?php echo isset($_POST['noTelMaison']) ? htmlspecialchars($_POST['noTelMaison']) : ''; ?>">
-        <br>
-        <label for="noTelTravail">Téléphone Travail :</label>
-        <input type="text" name="noTelTravail" id="noTelTravail" required value="<?php echo isset($_POST['noTelTravail']) ? htmlspecialchars($_POST['noTelTravail']) : ''; ?>">
-        <br>
-        <label for="noTelCellulaire">Téléphone Cellulaire :</label>
-        <input type="text" name="noTelCellulaire" id="noTelCellulaire" required value="<?php echo isset($_POST['noTelCellulaire']) ? htmlspecialchars($_POST['noTelCellulaire']) : ''; ?>">
-        <br>
-        <input type="checkbox" name="isAdmin" value="1" id="isAdmin">
-        <label for="isAdmin">Inscrire en tant qu'administrateur</label>
-        <br>
-        <button type="submit">S'inscrire</button>
-    </form>
 
+        <label for="password2">Confirmez le mot de passe :</label>
+        <input type="password" name="password2" id="password2" required>
+
+        <label for="nom">Nom :</label>
+        <input type="text" name="nom" id="nom" required>
+
+        <label for="prenom">Prénom :</label>
+        <input type="text" name="prenom" id="prenom" required>
+
+        <label for="noTelMaison">Numéro de téléphone (Maison) :</label>
+        <input type="tel" name="noTelMaison" id="noTelMaison" required>
+
+        <label for="noTelTravail">Numéro de téléphone (Travail) :</label>
+        <input type="tel" name="noTelTravail" id="noTelTravail" required>
+
+        <label for="noTelCellulaire">Numéro de téléphone (Cellulaire) :</label>
+        <input type="tel" name="noTelCellulaire" id="noTelCellulaire" required>
+
+        <!-- Section pour inscrire en tant qu'administrateur -->
+        <div id="adminSection" style="display: none;">
+            <label>
+                <input type="checkbox" name="isAdmin" value="1" id="isAdmin"> Inscrire en tant qu'administrateur
+            </label>
+        </div>
+
+        <input type="submit" value="S'inscrire">
+    </form>
 </body>
 </html>
