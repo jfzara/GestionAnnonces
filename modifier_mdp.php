@@ -25,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = 'Tous les champs sont obligatoires.';
     } elseif ($newPassword !== $confirmPassword) {
         $error = 'Les nouveaux mots de passe ne correspondent pas.';
+    } elseif (strlen($newPassword) < 6) {
+        $error = 'Le nouveau mot de passe doit contenir au moins 6 caractères.';
     } else {
         // Vérifier le mot de passe actuel
         $userId = $_SESSION['NoUtilisateur']; // Utilisation de NoUtilisateur
@@ -47,13 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if ($updateStmt->execute()) {
                     $success = 'Mot de passe mis à jour avec succès.';
                 } else {
-                    $error = 'Une erreur s\'est produite lors de la mise à jour du mot de passe.';
+                    $error = 'Une erreur s\'est produite lors de la mise à jour du mot de passe. Veuillez réessayer.';
                 }
             } else {
-                $error = 'Le mot de passe actuel est incorrect.';
+                $error = 'Le mot de passe actuel est incorrect. Veuillez réessayer.';
             }
         } else {
-            $error = 'Utilisateur non trouvé.';
+            $error = 'Utilisateur non trouvé. Veuillez vous reconnecter.';
         }
     }
 }
@@ -97,7 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
 
         <button type="submit" class="btn btn-primary">Mettre à jour le mot de passe</button>
+        <a href="annonces.php" class="btn btn-info">Retour à l'accueil</a>
     </form>
+    
 </div>
 
 </body>
