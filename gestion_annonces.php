@@ -40,7 +40,7 @@ $result = $stmt->get_result();
         <a href="annonces.php">Annonces</a>
         <a href="gestion_annonces.php">Gestion de vos annonces</a>
         <a href="modifier_profil.php">Modification du profil</a>
-        <a href="logout.php">Déconnexion</a>
+        <a href="Deconnexion.php">Déconnexion</a>
     </nav>
 
     <div class="text-right">
@@ -86,7 +86,7 @@ $result = $stmt->get_result();
             echo "</tr>";
         }
     } else {
-        echo "<tr><td colspan='10' class='text-center'>Aucune annonce trouvée.</td></tr>";
+        echo "<tr><td colspan='10' class='text-center'>Vous n'avez aucune annonce enregistrée.</td></tr>";
     }
     // Fermer la connexion
     $stmt->close();

@@ -127,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <input type="submit" value="Ajouter" class="btn btn-primary">
         <a href="index.php" class="btn btn-secondary">Annuler</a>
-        <a href="dashboard.php" class="btn btn-info">Retour au Dashboard</a>
+        <a href="annonces.php" class="btn btn-info">Retour à l'accueil</a>
     </form>
 </div>
 </body>

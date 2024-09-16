@@ -9,7 +9,7 @@ include('config.php');
 // Fonction pour vérifier si l'utilisateur est authentifié
 function checkAuth() {
     if (isset($_SESSION['NoUtilisateur'])) {
-        header("Location: dashboard.php"); // Rediriger vers le tableau de bord si déjà connecté
+        header("Location: annonces.php"); // Rediriger vers annonces.php si déjà connecté
         exit();
     }
 }
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Enregistrer l'ID de l'utilisateur dans la session
             $_SESSION['NoUtilisateur'] = $user['NoUtilisateur'];
-            header('Location: dashboard.php'); // Rediriger vers le tableau de bord
+            header('Location: annonces.php'); // Rediriger vers annonces.php
             exit();
         } else {
             $_SESSION['error'] = "Mot de passe incorrect.";
