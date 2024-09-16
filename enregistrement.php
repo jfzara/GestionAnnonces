@@ -22,6 +22,7 @@ const ERROR_PASSWORD_INVALID = "Le mot de passe doit comporter entre 5 et 15 car
 const ERROR_EMPTY_FIELDS = "Veuillez remplir tous les champs obligatoires.";
 const ERROR_REGISTRATION = "Erreur lors de l'enregistrement.";
 const SUCCESS_REGISTRATION = "Enregistrement réussi. Veuillez vérifier votre courriel pour confirmer votre inscription.";
+const SUCCESS_ADMIN_REGISTRATION = "Enregistrement réussi en tant que ADMINISTRATEUR."; // Message de succès pour les admins
 
 // Vérifiez si la méthode de la requête est POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -75,13 +76,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
         $token = bin2hex(random_bytes(16));
 
+        // Déterminer le statut (admin ou utilisateur normal)
+        $statut = 0; // Par défaut, statut utilisateur normal
+        if (isset($_POST['isAdmin']) && $_POST['isAdmin'] === '1' && $courriel === 'admin@gmail.com') {
+            $statut = 1; // 1 pour admin
+        }
+
         // Insérer les données dans la base de données
         $query = "INSERT INTO utilisateurs (Courriel, MotDePasse, Nom, Prenom, Statut, Token, NoTelMaison, NoTelTravail, NoTelCellulaire)
-                  VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)";
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
 
-        // Lier uniquement les variables qui correspondent aux paramètres de la requête
-        $stmt->bind_param("ssssssss", $courriel, $hashed_password, $nom, $prenom, $token, $noTelMaison, $noTelTravail, $noTelCellulaire);
+        // Lier les variables qui correspondent aux paramètres de la requête
+        $stmt->bind_param("sssssssss", $courriel, $hashed_password, $nom, $prenom, $statut, $token, $noTelMaison, $noTelTravail, $noTelCellulaire);
 
         // Exécuter la requête
         if ($stmt->execute()) {
@@ -110,7 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mail->send();
 
                 // Stocker un message de succès dans la session pour affichage
-                $_SESSION['success'] = SUCCESS_REGISTRATION;
+                $_SESSION['success'] = ($statut === 1) ? SUCCESS_ADMIN_REGISTRATION : SUCCESS_REGISTRATION;
+                $_SESSION['isAdmin'] = $statut === 1; // Stocker le statut dans la session pour l'affichage
+
             } catch (Exception $e) {
                 $_SESSION['error'] = "Le courriel n'a pas pu être envoyé. Erreur : " . $mail->ErrorInfo;
             }
@@ -123,6 +132,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
+<!-- Affichage du message de succès avec un bouton de connexion -->
+<?php if (isset($_SESSION['success'])): ?>
+    <div class="alert alert-success">
+        <?php echo $_SESSION['success']; ?>
+        <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin']): ?>
+            <br><a href="login.php" class="btn btn-primary">Connexion</a>
+        <?php endif; ?>
+    </div>
+    <?php unset($_SESSION['success']); ?>
+<?php endif; ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -133,9 +153,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-
-    <form class = "register_form" action="enregistrement.php" method="POST">
-    <p class="titre">Inscription</p>
+    <form class="register_form" action="enregistrement.php" method="POST">
+        <p class="titre">Inscription</p>
         <label for="email1">Courriel :</label>
         <input type="email" name="courriel" id="email1" required value="<?php echo isset($_POST['courriel']) ? htmlspecialchars($_POST['courriel']) : ''; ?>">
         <br>
@@ -151,43 +170,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="prenom">Prénom :</label>
         <input type="text" name="prenom" id="prenom" required value="<?php echo isset($_POST['prenom']) ? htmlspecialchars($_POST['prenom']) : ''; ?>">
         <br>
-        <label for="noTelMaison">Numéro de téléphone (Maison) :</label>
+        <label for="noTelMaison">Téléphone Maison :</label>
         <input type="text" name="noTelMaison" id="noTelMaison" required value="<?php echo isset($_POST['noTelMaison']) ? htmlspecialchars($_POST['noTelMaison']) : ''; ?>">
-        <label for="telTypeMaison"> </label>
-        <select name="telTypeMaison" id="telTypeMaison">
-            <option value="P">Public</option>
-            <option value="N">Non-Public</option>
-        </select>
         <br>
-        <label for="noTelTravail">Numéro de téléphone (Travail) :</label>
+        <label for="noTelTravail">Téléphone Travail :</label>
         <input type="text" name="noTelTravail" id="noTelTravail" required value="<?php echo isset($_POST['noTelTravail']) ? htmlspecialchars($_POST['noTelTravail']) : ''; ?>">
-        <label for="telTypeTravail"> </label>
-        <select name="telTypeTravail" id="telTypeTravail">
-            <option value="P">Public</option>
-            <option value="N">Non-Public</option>
-        </select>
         <br>
-        <label for="noTelCellulaire">Numéro de téléphone (Cellulaire) :</label>
+        <label for="noTelCellulaire">Téléphone Cellulaire :</label>
         <input type="text" name="noTelCellulaire" id="noTelCellulaire" required value="<?php echo isset($_POST['noTelCellulaire']) ? htmlspecialchars($_POST['noTelCellulaire']) : ''; ?>">
         <br>
+        <input type="checkbox" name="isAdmin" value="1" id="isAdmin">
+        <label for="isAdmin">Inscrire en tant qu'administrateur</label>
+        <br>
         <button type="submit">S'inscrire</button>
-    
-    <!-- Affichage des erreurs s'il y en a -->
-<?php if (isset($_SESSION['errors']) && !empty($_SESSION['errors'])): ?>
-        <div class="errors">
-            <?php foreach ($_SESSION['errors'] as $error): ?>
-                <p><?php echo htmlspecialchars($error); ?></p>
-            <?php endforeach; ?>
-        </div>
-        <?php unset($_SESSION['errors']); // Effacer les erreurs après les avoir affichées ?>
-    <?php endif; ?>
-
-    <!-- Affichage du message de succès -->
-    <?php if (isset($_SESSION['success'])): ?>
-        <p class="success"><?php echo htmlspecialchars($_SESSION['success']); ?></p>
-        <?php unset($_SESSION['success']); // Effacer le message après l'avoir affiché ?>
-    <?php endif; ?>
-
     </form>
+
 </body>
 </html>
