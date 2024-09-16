@@ -15,4 +15,7 @@ if ($conn->connect_error) {
 
 // Activer les erreurs pour le débogage
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+// Options supplémentaires pour une meilleure gestion des erreurs
+$conn->set_charset("utf8"); // Assurez-vous que la connexion utilise UTF-8
 ?>

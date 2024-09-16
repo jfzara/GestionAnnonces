@@ -49,6 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Enregistrer l'ID de l'utilisateur dans la session
             $_SESSION['NoUtilisateur'] = $user['NoUtilisateur'];
+            // Ajoutez ceci pour le débogage
+var_dump($_SESSION);
+header('Location: annonces.php');
+exit();
             header('Location: annonces.php'); // Rediriger vers annonces.php
             exit();
         } else {

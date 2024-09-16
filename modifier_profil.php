@@ -98,7 +98,7 @@
 <div id="divMAJProfile" class="form-container">
     <h1 id="titreMAJProfile">Mise à jour du profil</h1>
     <br>
-    <form id="formMAJProfile" action="EnvoieMAJProfile.php" method="POST" onsubmit="return validerFormulaire();">
+    <form id="formMAJProfile" action="envoi_maj_profil.php" method="POST" onsubmit="return validerFormulaire();">
 
         <div class="form-group row">
             <label class="col-4 col-form-label" for="tbEmail">Email</label>
@@ -193,6 +193,7 @@
             </div>
         </div>
     </form>
+    <a href="annonces.php" class="btn btn-info">Retour à l'accueil</a>
 </div>
 </body>
 </html>
