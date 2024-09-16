@@ -49,11 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Enregistrer l'ID de l'utilisateur dans la session
             $_SESSION['NoUtilisateur'] = $user['NoUtilisateur'];
-            // Ajoutez ceci pour le débogage
-var_dump($_SESSION);
-header('Location: annonces.php');
-exit();
-            header('Location: annonces.php'); // Rediriger vers annonces.php
+
+            // Déterminer si l'utilisateur est un administrateur
+            $_SESSION['isAdmin'] = ($courriel === 'admin@gmail.com'); // Vérification simplifiée
+
+            // Rediriger vers annonces.php
+            header('Location: annonces.php');
             exit();
         } else {
             $_SESSION['error'] = "Mot de passe incorrect.";
@@ -101,19 +102,30 @@ exit();
             errorDiv.innerHTML = ""; // Effacer les messages d'erreur
             return true; // Si tout est valide, soumettre le formulaire
         }
+
+        function checkAdminEmail() {
+            const email = document.getElementById('courriel').value;
+            const adminSpan = document.getElementById('adminIndicator');
+
+            // Vérifier si l'email correspond à admin@gmail.com
+            if (email === "admin@gmail.com") {
+                adminSpan.style.display = "inline"; // Afficher le span
+            } else {
+                adminSpan.style.display = "none"; // Cacher le span
+            }
+        }
     </script>
 </head>
 <body>
  
-    <form  class="loginform"  action="login.php" method="POST" onsubmit="return validateForm();">
+    <form class="loginform" action="login.php" method="POST" onsubmit="return validateForm();">
         <p class="titre connexion">Connexion</p>
         <label for="courriel">Courriel :</label>
-        <input type="email" name="courriel" id="courriel" required>
+        <input type="email" name="courriel" id="courriel" required oninput="checkAdminEmail();">
+        <span id="adminIndicator" style="color: green; font-weight: bold; padding; 1rem;padding-inline: rem;  display: none; margin-left: 10px; background: white; border-radius: 5px;">ADMIN</span>
         <br>
         <label for="mot_de_passe">Mot de passe :</label>
         <input type="password" name="mot_de_passe" id="mot_de_passe" required>
-        <br>
-       
         <br>
         <input class="soumettre" type="submit" value="Se connecter">
 
@@ -129,6 +141,5 @@ exit();
         <p><a class="lien_enregistrement" href="enregistrement.php">Créer un compte</a></p>
     </form>
     
- 
 </body>
 </html>
