@@ -131,7 +131,7 @@ $conn->close();
         <a href="annonces.php">Annonces</a>
         <a href="gestion_annonces.php">Gestion de vos annonces</a>
         <a href="modifier_profil.php">Modification du profil</a>
-        <a href="Deconnexion.php">Déconnexion</a>
+        <a href="logout.php">Déconnexion</a>
     </nav>
 
     <form class="update_form" method="POST" action="" enctype="multipart/form-data">

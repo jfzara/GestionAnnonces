@@ -68,7 +68,7 @@ $total_pages = ceil( $total / $limit );
 <a href = 'annonces.php' class = 'nav-item'>Annonces</a>
 <a href = 'gestion_annonces.php' class = 'nav-item'>Gestion de vos annonces</a>
 <a href = 'modifier_profil.php' class = 'nav-item'>Modification du profil</a>
-<a href = 'Deconnexion.php' class = 'nav-item'>Déconnexion</a>
+<a href = 'logout.php' class = 'nav-item'>Déconnexion</a>
 </nav>
 <div id = 'divRecherche' style = "width: 90%; display: flex; justify-content: space-between; padding: 10px;position: relative;
     top: -13vh;">
@@ -117,53 +117,61 @@ $total_pages = ceil( $total / $limit );
 <?php
 // Connexion à la base de données
 $servername = 'localhost';
-
 $username = 'root';
-
 $password = '';
-
 $dbname = 'gestionannonces';
 
 // Création de la connexion
-$conn = new mysqli( $servername, $username, $password, $dbname );
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Vérification de la connexion
-if ( $conn->connect_error ) {
-    die( 'Échec de la connexion: ' . $conn->connect_error );
+if ($conn->connect_error) {
+    die('Échec de la connexion: ' . $conn->connect_error);
 }
 
 // Vérifier si le formulaire a été soumis
-if ( $_SERVER[ 'REQUEST_METHOD' ] == 'POST' ) {
-    $criteria = $_POST[ 'criteria' ];
-    $searchTerm = $conn->real_escape_string( $_POST[ 'searchTerm' ] );
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['criteria']) && isset($_POST['searchTerm'])) {
+    $criteria = $_POST['criteria'];
+    $searchTerm = $conn->real_escape_string($_POST['searchTerm']);
 
     // Construire la requête SQL en fonction du critère sélectionné
-    switch ( $criteria ) {
+    switch ($criteria) {
         case 'date':
-        $sql = "SELECT * FROM annonces WHERE Parution LIKE '%$searchTerm%'";
-        break;
+            // Format de recherche pour la date
+            $sql = "SELECT * FROM annonces WHERE Parution LIKE '%$searchTerm%'";
+            break;
         case 'auteur':
-        $sql = "SELECT * FROM annonces WHERE NoUtilisateur LIKE '%$searchTerm%'";
-        break;
+            // Recherche par NoUtilisateur
+            if (is_numeric($searchTerm)) {
+                $sql = "SELECT * FROM annonces WHERE NoUtilisateur = $searchTerm";
+            } else {
+                $sql = "SELECT * FROM annonces WHERE NoUtilisateur LIKE '%$searchTerm%'";
+            }
+            break;
         case 'categorie':
-        $sql = "SELECT * FROM annonces WHERE Categorie LIKE '%$searchTerm%'";
-        break;
+            // Recherche par Categorie
+            if (is_numeric($searchTerm)) {
+                $sql = "SELECT * FROM annonces WHERE Categorie = $searchTerm";
+            } else {
+                $sql = "SELECT * FROM annonces WHERE Categorie LIKE '%$searchTerm%'";
+            }
+            break;
         default:
-        $sql = 'SELECT * FROM annonces';
-        // Valeur par défaut
+            $sql = 'SELECT * FROM annonces'; // Valeur par défaut
+            break;
     }
 
-    $result = $conn->query( $sql );
+    $result = $conn->query($sql);
 
-    if ( $result->num_rows > 0 ) {
+    if ($result && $result->num_rows > 0) {
         // Afficher les annonces pertinentes
         echo "<table border='1'>";
         echo '<tr><th>NoAnnonce</th><th>Parution</th><th>Catégorie</th><th>DescriptionAbregee</th><th>Prix</th></tr>';
-        while ( $row = $result->fetch_assoc() ) {
+        while ($row = $result->fetch_assoc()) {
             echo "<tr>
                     <td>{$row['NoAnnonce']}</td>
                     <td>{$row['Parution']}</td>
-                    <td>" . getCategoryName( $row[ 'Categorie' ] ) . "</td>
+                    <td>{$row['Categorie']}</td> <!-- Vous pouvez remplacer par getCategoryName si nécessaire -->
                     <td>{$row['DescriptionAbregee']}</td>
                     <td>{$row['Prix']}</td>
                   </tr>";
@@ -174,6 +182,7 @@ if ( $_SERVER[ 'REQUEST_METHOD' ] == 'POST' ) {
     }
 }
 
+// Fermer la connexion
 $conn->close();
 ?>
 </div>

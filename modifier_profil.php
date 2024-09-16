@@ -11,7 +11,7 @@
     <a href="annonces.php" class="nav-item">Annonces</a>
     <a href="gestion_annonces.php" class="nav-item">Gestion de vos annonces</a>
     <a href="modifier_profil.php" class="nav-item">Modification du profil</a>
-    <a href="Deconnexion.php" class="nav-item">Déconnexion</a>
+    <a href="logout.php" class="nav-item">Déconnexion</a>
 </nav>
 
 

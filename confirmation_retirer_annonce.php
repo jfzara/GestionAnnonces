@@ -1,6 +1,6 @@
 <?php
 // connexion à la base de données
-require 'database_connection.php'; // Remplacez par le chemin vers votre fichier de connexion
+require 'db.php'; // Remplacez par le chemin vers votre fichier de connexion
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']); // Assurez-vous de valider l'ID
