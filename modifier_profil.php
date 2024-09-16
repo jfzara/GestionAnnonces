@@ -96,7 +96,7 @@
 </nav>
 
 <div id="divMAJProfile" class="form-container">
-    <h1 id="titreMAJProfile">Mise à jour du profil</h1>
+    <h1 id="titreMAJProfile">Modifier votre profil</h1>
     <br>
     <form id="formMAJProfile" action="envoi_maj_profil.php" method="POST" onsubmit="return validerFormulaire();">
 
@@ -189,7 +189,7 @@
 
         <div class="form-group row">
             <div class="col-6">
-                <input type="submit" class="btn btn-primary" value="Modifier">
+                <input type="submit" class="btn btn-primary" value="Modifier" style = "background-color : #007bff; color: white; font-weight: bolder; cursor : pointer;" >
             </div>
         </div>
     </form>
