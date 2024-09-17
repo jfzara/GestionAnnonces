@@ -11,6 +11,9 @@ if (!isset($_SESSION['NoUtilisateur'])) {
 $userId = $_SESSION['NoUtilisateur'];
 $message = ""; // Initialiser le message
 
+// Afficher l'ID utilisateur pour le débogage
+var_dump("User ID: ", $userId);
+
 // Vérifiez si le formulaire a été soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Récupérer et valider les données
@@ -22,6 +25,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $telMaison = trim($_POST['tbTelM']);
     $telCellulaire = trim($_POST['tbTelC']);
     $statut = trim($_POST['tbStatut']);
+
+    // Afficher les données récupérées pour le débogage
+    var_dump("POST data: ", $_POST);
 
     // Vérification des informations requises
     if (empty($nom) || empty($prenom) || empty($email) || empty($statut)) {
@@ -42,9 +48,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $stmt = $conn->prepare($query);
 
+        // Afficher si la préparation de la requête a réussi
+        var_dump("Statement preparation: ", $stmt ? 'Success' : 'Failed');
+
         if ($stmt) {
             $stmt->bind_param('sssssssi', $nom, $prenom, $email, $telMaison, $telCellulaire, $posteTelBureau, $statut, $userId);
             
+            // Afficher les valeurs liées pour le débogage
+            var_dump("Bound parameters: ", [$nom, $prenom, $email, $telMaison, $telCellulaire, $posteTelBureau, $statut, $userId]);
+
             if ($stmt->execute()) {
                 $message = "<div style='color: green;'>Profil mis à jour avec succès.</div>";
                 // Rediriger après une mise à jour réussie
@@ -52,15 +64,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
             } else {
                 $message = "<div style='color: red;'>Erreur lors de la mise à jour du profil : " . $stmt->error . "</div>";
+                var_dump("Execute error: ", $stmt->error);
             }
             
             $stmt->close();
         } else {
             $message = "<div style='color: red;'>Erreur lors de la préparation de la requête : " . $conn->error . "</div>";
+            var_dump("Connection error: ", $conn->error);
         }
     }
 }
 
+// Fermer la connexion
 $conn->close();
 ?>
 
