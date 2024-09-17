@@ -18,55 +18,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = isset($_POST['tbEmail']) ? filter_var(trim($_POST['tbEmail']), FILTER_SANITIZE_EMAIL) : '';
     $password = isset($_POST['tbPassword']) ? trim($_POST['tbPassword']) : '';
 
+    // Affichage des valeurs pour le débogage
+    echo "Nom: $nom<br>";
+    echo "Prénom: $prenom<br>";
+    echo "Email: $email<br>";
+    echo "Mot de passe: " . str_repeat('*', strlen($password)) . "<br>"; // Masquer le mot de passe
+
     // Vérification de l'e-mail
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $message = "<div style='color: red;'>Email invalide.</div>";
     } else {
-        // Générer un token de confirmation
-        $token = bin2hex(random_bytes(16)); // Générez un token aléatoire de 32 caractères
-
-        // Requête d'insertion
-        $query = 'INSERT INTO utilisateurs (Nom, Prenom, Courriel, MotDePasse, Statut, Token) VALUES (?, ?, ?, ?, 0, ?)';
+        // Vérification si l'email existe déjà
+        $query = 'SELECT Courriel FROM utilisateurs WHERE Courriel = ?';
         $stmt = $conn->prepare($query);
+        $stmt->bind_param('s', $email);
+        $stmt->execute();
+        $stmt->store_result();
 
-        if ($stmt) {
-            // Hash du mot de passe avant de le stocker
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $stmt->bind_param('sssss', $nom, $prenom, $email, $hashedPassword, $token);
-            
-            if ($stmt->execute()) {
-                // Envoi de l'e-mail de confirmation
-                $mail = new PHPMailer(); // Utilisez cette ligne
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com'; // Remplacez par votre hôte SMTP
-                $mail->SMTPAuth = true;
-                $mail->Username = 'zarajeanfabrice@gmail.com'; // Votre adresse e-mail
-                $mail->Password = 'lybddpkiorncgsxs'; // Votre mot de passe
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
-
-                // Destinataires
-                $mail->setFrom('your_email@example.com', 'Nom de votre application');
-                $mail->addAddress($email);
-
-                // Contenu
-                $mail->isHTML(true);
-                $mail->Subject = 'Confirmation de votre compte';
-                $mail->Body    = "Bonjour $prenom,<br><br>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour confirmer votre compte :<br><a href='http://yourdomain.com/confirmation.php?token=$token'>Confirmer mon compte</a>";
-
-                if ($mail->send()) {
-                    // Message de succès
-                    $message = "Pour confirmer votre inscription, veuillez cliquer sur le lien envoyé à <strong>$email</strong>.";
-                } else {
-                    $message = "<div style='color: red;'>Erreur lors de l'envoi de l'e-mail de confirmation.</div>";
-                }
-            } else {
-                $message = "<div style='color: red;'>Erreur lors de l'enregistrement : " . $stmt->error . "</div>";
-            }
-
-            $stmt->close();
+        if ($stmt->num_rows > 0) {
+            $message = "<div style='color: red;'>L'email est déjà utilisé.</div>";
         } else {
-            $message = "<div style='color: red;'>Erreur lors de la préparation de la requête : " . $conn->error . "</div>";
+            // Générer un token de confirmation
+            $token = bin2hex(random_bytes(16)); // Générez un token aléatoire de 32 caractères
+
+            // Requête d'insertion
+            $query = 'INSERT INTO utilisateurs (Nom, Prenom, Courriel, MotDePasse, Statut, Token) VALUES (?, ?, ?, ?, 0, ?)';
+            $stmt = $conn->prepare($query);
+
+            if ($stmt) {
+                // Hash du mot de passe avant de le stocker
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $stmt->bind_param('sssss', $nom, $prenom, $email, $hashedPassword, $token);
+                
+                if ($stmt->execute()) {
+                    // Envoi de l'e-mail de confirmation
+                    $mail = new PHPMailer(); // Utilisez cette ligne
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com'; // Remplacez par votre hôte SMTP
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'zarajeanfabrice@gmail.com'; // Votre adresse e-mail
+                    $mail->Password = 'lybddpkiorncgsxs'; // Votre mot de passe
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+
+                    // Destinataires
+                    $mail->setFrom('your_email@example.com', 'Nom de votre application');
+                    $mail->addAddress($email);
+
+                    // Contenu
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Confirmation de votre compte';
+                    $mail->Body    = "Bonjour $prenom,<br><br>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour confirmer votre compte :<br><a href='http://yourdomain.com/confirmation.php?token=$token'>Confirmer mon compte</a>";
+
+                    if ($mail->send()) {
+                        // Message de succès
+                        $message = "Pour confirmer votre inscription, veuillez cliquer sur le lien envoyé à <strong>$email</strong>.";
+                    } else {
+                        $message = "<div style='color: red;'>Erreur lors de l'envoi de l'e-mail de confirmation.</div>";
+                    }
+                } else {
+                    $message = "<div style='color: red;'>Erreur lors de l'enregistrement : " . $stmt->error . "</div>";
+                }
+
+                $stmt->close();
+            } else {
+                $message = "<div style='color: red;'>Erreur lors de la préparation de la requête : " . $conn->error . "</div>";
+            }
         }
     }
 }
@@ -94,4 +111,3 @@ $conn->close();
     </div>
 </body>
 </html>
- 
