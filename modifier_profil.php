@@ -6,7 +6,8 @@
     <title>Modifier Profil</title>
     <link rel="stylesheet" href="styles.css">
     <script>
-        function validerFormulaire() {
+        function validerFormulaire(event) {
+            event.preventDefault(); // Empêcher la soumission du formulaire par défaut
             let errors = [];
             const nom = document.getElementById('tbNom').value.trim();
             const prenom = document.getElementById('tbPrenom').value.trim();
@@ -57,10 +58,11 @@
 
             if (errors.length > 0) {
                 alert(errors.join("\n"));
-                return false;
+                return false; // Ne pas soumettre le formulaire
             }
 
-            return true;
+            // Si tout est bon, soumettre le formulaire
+            document.getElementById('formMAJProfile').submit();
         }
 
         function validateEmail(email) {
@@ -70,11 +72,9 @@
 
         // Formater le numéro de téléphone
         function formatTelephone(input) {
-            // Enlever tous les caractères qui ne sont pas des chiffres
             const digits = input.value.replace(/\D/g, '');
             let formattedNumber = '';
 
-            // Formater selon le nombre de chiffres
             if (digits.length <= 3) {
                 formattedNumber = digits;
             } else if (digits.length <= 6) {
@@ -83,7 +83,7 @@
                 formattedNumber = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
             }
 
-            input.value = formattedNumber; // Mettre à jour la valeur de l'input
+            input.value = formattedNumber;
         }
     </script>
 </head>
@@ -98,7 +98,7 @@
 <div id="divMAJProfile" class="form-container">
     <h1 id="titreMAJProfile">Modifier votre profil</h1>
     <br>
-    <form id="formMAJProfile" action="envoi_maj_profil.php" method="POST" onsubmit="return validerFormulaire();">
+    <form id="formMAJProfile" action="envoi_maj_profil.php" method="POST" onsubmit="validerFormulaire(event);">
 
         <div class="form-group row">
             <label class="col-4 col-form-label" for="tbEmail">Email</label>
@@ -171,8 +171,6 @@
             <label for="tbTelM" class="col-4 col-form-label">Numéro Téléphone Maison</label>
             <div class="col-6">
                 <input type="text" class="form-control" id="tbTelM" name="tbTelM" oninput="formatTelephone(this)" placeholder="(xxx) xxx-xxxx">
-                <label for="cbTelMP" class="col-5 col-form-label">Privé ?</label>
-                <input type="checkbox" class="" id="cbTelMP" name="cbTelMP">
             </div>
             <p id="errTelM" class="text-danger font-weight-bold"></p>
         </div>
@@ -181,19 +179,15 @@
             <label for="tbTelC" class="col-4 col-form-label">Numéro Téléphone Cellulaire</label>
             <div class="col-6">
                 <input type="text" class="form-control" id="tbTelC" name="tbTelC" oninput="formatTelephone(this)" placeholder="(xxx) xxx-xxxx">
-                <label for="cbTelCP" class="col-5 col-form-label">Privé ?</label>
-                <input type="checkbox" class="" id="cbTelCP" name="cbTelCP">
             </div>
             <p id="errTelC" class="text-danger font-weight-bold"></p>
         </div>
 
-        <div class="form-group row">
-            <div class="col-6">
-                <input type="submit" class="btn btn-primary" value="Modifier" style = "background-color : #007bff; color: white; font-weight: bolder; cursor : pointer;" >
-            </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Sauvegarder les modifications</button>
         </div>
     </form>
-    <a href="annonces.php" class="btn btn-info">Retour à l'accueil</a>
 </div>
+
 </body>
 </html>
