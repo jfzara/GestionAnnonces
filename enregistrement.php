@@ -69,22 +69,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = ERROR_EMAIL_USED;
     }
 
-    // Si des erreurs existent, retourner à la page d'enregistrement avec les messages d'erreur
-    if (!empty($errors)) {
-        $_SESSION['errors'] = $errors; // Stocker les erreurs dans la session
-    } else {
-        // Hachage du mot de passe et génération d'un token
+    if (empty($errors)) {
+        // Hachage du mot de passe
         $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
-        $token = bin2hex(random_bytes(16));
-
+    
         // Insérer les données dans la base de données uniquement avec le courriel et le mot de passe
-        $query = "INSERT INTO utilisateurs (Courriel, MotDePasse, Token)
-                  VALUES (?, ?, ?)";
+        $query = "INSERT INTO utilisateurs (Courriel, MotDePasse) VALUES (?, ?)";
         $stmt = $conn->prepare($query);
         
         // Lier les variables qui correspondent aux paramètres de la requête
-        $stmt->bind_param("sss", $courriel, $hashed_password, $token);
-
+        $stmt->bind_param("ss", $courriel, $hashed_password);
+    
         // Exécuter la requête
         if ($stmt->execute()) {
             // Envoi du courriel de confirmation à l'utilisateur

@@ -7,7 +7,7 @@ include 'db.php';
 // Vérifiez si l'utilisateur est connecté
 if (!isset($_SESSION['NoUtilisateur'])) {
     // Redirection vers la page de connexion ou une autre page
-    header('Location: annonces.php'); // Vous pouvez changer cette ligne si nécessaire
+    header('Location: login.php'); 
     exit();
 }
 
