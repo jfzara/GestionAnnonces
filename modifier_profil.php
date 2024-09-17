@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,105 +6,121 @@
     <title>Modifier Profil</title>
     <link rel="stylesheet" href="styles.css">
     <script>
-        function validerFormulaire(event) {
-            event.preventDefault(); // Empêcher la soumission du formulaire par défaut
-            let errors = [];
-            const nom = document.getElementById('tbNom').value.trim();
-            const prenom = document.getElementById('tbPrenom').value.trim();
-            const email = document.getElementById('tbEmail').value.trim();
-            const tbTelM = document.getElementById('tbTelM').value.trim();
-            const tbTelC = document.getElementById('tbTelC').value.trim();
-            const posteTelBureau = document.getElementById('tbTelTPoste').value.trim();
-            const NoEmpl = document.getElementById('tbNoEmpl').value.trim();
-            const statut = document.getElementById('tbStatut').value;
+    function validerFormulaire(event) {
+     
+        let errors = [];
+        const nom = document.getElementById('tbNom').value.trim();
+        const prenom = document.getElementById('tbPrenom').value.trim();
+        const email = document.getElementById('tbEmail').value.trim();
+        const telMaison = document.getElementById('tbTelM').value.trim();
+        const telCellulaire = document.getElementById('tbTelC').value.trim();
+        const telTravail = document.getElementById('tbTelT').value.trim();
+        const NoEmpl = document.getElementById('tbNoEmpl').value.trim(); // Utilisation de trim()
+        const statut = document.getElementById('tbStatut').value;
 
-            // Validation des champs
-            console.log("Validation des champs");
-            console.log("Nom:", nom);
-            console.log("Prénom:", prenom);
-            console.log("Email:", email);
-            console.log("Téléphone Maison:", tbTelM);
-            console.log("Téléphone Cellulaire:", tbTelC);
-            console.log("Numéro Poste Bureau:", posteTelBureau);
-            console.log("Numéro Employé:", NoEmpl);
-            console.log("Statut:", statut);
+        // Validation des champs
+        console.log("Validation des champs");
+        console.log("Nom:", nom);
+        console.log("Prénom:", prenom);
+        console.log("Email:", email);
+        console.log("Téléphone Maison:", telMaison);
+        console.log("Téléphone Cellulaire:", telCellulaire);
+        console.log("Téléphone Travail:", telTravail);
+        console.log("Numéro Employé:", NoEmpl);
+        console.log("Statut:", statut);
 
-            if (nom === "") {
-                errors.push("Le nom est obligatoire.");
-            } else if (nom.length > 50) {
-                errors.push("Le nom ne doit pas dépasser 50 caractères.");
-            }
-            
-            if (prenom === "") {
-                errors.push("Le prénom est obligatoire.");
-            } else if (prenom.length > 50) {
-                errors.push("Le prénom ne doit pas dépasser 50 caractères.");
-            }
-            
-            if (email === "") {
-                errors.push("L'email est obligatoire.");
-            } else if (!validateEmail(email)) {
-                errors.push("L'email n'est pas valide.");
-            }
-
-            const telMaisonPattern = /^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/;
-            if (tbTelM !== "" && !telMaisonPattern.test(tbTelM)) {
-                errors.push("Le téléphone maison doit être au format (xxx) xxx-xxxx ou xxx-xxx-xxxx ou xxxxxxxxxx.");
-            }
-
-            if (tbTelC !== "" && !telMaisonPattern.test(tbTelC)) {
-                errors.push("Le téléphone cellulaire doit être au format (xxx) xxx-xxxx ou xxx-xxx-xxxx ou xxxxxxxxxx.");
-            }
-
-            if (posteTelBureau === "") {
-                errors.push("Le numéro de poste est obligatoire.");
-            } else if (!/^[0-9]{4}$/.test(posteTelBureau)) {
-                errors.push("Le numéro de poste doit contenir 4 chiffres.");
-            }
-
-            if (NoEmpl === "") {
-                errors.push("Le numéro d'emploi est obligatoire.");
-            } else if (!/^[0-9]+$/.test(NoEmpl)) {
-                errors.push("Le numéro d'emploi doit être un nombre entier.");
-            }
-
-            if (statut === "") {
-                errors.push("Le statut est obligatoire.");
-            }
-
-            // Affichage des erreurs
-            if (errors.length > 0) {
-                console.log("Erreurs trouvées:", errors);
-                alert(errors.join("\n"));
-                return false; // Ne pas soumettre le formulaire
-            }
-
-            console.log("Aucune erreur trouvée, soumission du formulaire.");
-            // Si tout est bon, soumettre le formulaire
-            document.getElementById('formMAJProfile').submit();
+        // Validation du nom (max 25 caractères)
+        if (nom === "") {
+            errors.push("Le nom est obligatoire.");
+        } else if (nom.length > 25) {
+            errors.push("Le nom ne doit pas dépasser 25 caractères.");
         }
 
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
+        // Validation du prénom (max 50 caractères)
+        if (prenom === "") {
+            errors.push("Le prénom est obligatoire.");
+        } else if (prenom.length > 50) {
+            errors.push("Le prénom ne doit pas dépasser 50 caractères.");
         }
 
-        // Formater le numéro de téléphone
-        function formatTelephone(input) {
-            const digits = input.value.replace(/\D/g, '');
-            let formattedNumber = '';
-
-            if (digits.length <= 3) {
-                formattedNumber = digits;
-            } else if (digits.length <= 6) {
-                formattedNumber = (${digits.slice(0, 3)}) ${digits.slice(3)};
-            } else {
-                formattedNumber = (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)};
-            }
-
-            input.value = formattedNumber;
+        // Validation de l'email (max 50 caractères)
+        if (email === "") {
+            errors.push("L'email est obligatoire.");
+        } else if (!validateEmail(email)) {
+            errors.push("L'email n'est pas valide.");
+        } else if (email.length > 50) {
+            errors.push("L'email ne doit pas dépasser 50 caractères.");
         }
-    </script>
+
+        // Validation des numéros de téléphone
+        const telPattern = /^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/;
+        if (telMaison !== "" && !telPattern.test(telMaison)) {
+            errors.push("Le téléphone maison doit être au format (xxx) xxx-xxxx ou xxx-xxx-xxxx ou xxxxxxxxxx.");
+        } else if (telMaison.length > 15) {
+            errors.push("Le téléphone maison ne doit pas dépasser 15 caractères.");
+        }
+
+        if (telCellulaire !== "" && !telPattern.test(telCellulaire)) {
+            errors.push("Le téléphone cellulaire doit être au format (xxx) xxx-xxxx ou xxx-xxx-xxxx ou xxxxxxxxxx.");
+        } else if (telCellulaire.length > 15) {
+            errors.push("Le téléphone cellulaire ne doit pas dépasser 15 caractères.");
+        }
+
+        if (telTravail !== "" && !telPattern.test(telTravail)) {
+            errors.push("Le téléphone travail doit être au format (xxx) xxx-xxxx ou xxx-xxx-xxxx ou xxxxxxxxxx.");
+        } else if (telTravail.length > 21) {
+            errors.push("Le téléphone travail ne doit pas dépasser 21 caractères.");
+        }
+
+        // Validation du numéro d'employé
+        if (NoEmpl === "") {
+            errors.push("Le numéro d'emploi est obligatoire.");
+        } else if (!/^[0-9]+$/.test(NoEmpl)) {
+            errors.push("Le numéro d'emploi doit être un nombre entier.");
+        }
+
+        // Validation du statut
+        if (statut === "") {
+            errors.push("Le statut est obligatoire.");
+        }
+
+        // Affichage des erreurs
+        if (errors.length > 0) {
+            console.log("Erreurs trouvées:", errors);
+            alert(errors.join("\n"));
+            return false; // Ne pas soumettre le formulaire
+        }
+
+        console.log("Aucune erreur trouvée, soumission du formulaire.");
+         // Afficher les informations saisies dans une alerte
+       
+
+        
+        // Si tout est bon, soumettre le formulaire
+        document.getElementById('formMAJProfile').submit();
+    }
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // Formater le numéro de téléphone
+    function formatTelephone(input) {
+        const digits = input.value.replace(/\D/g, '');
+        let formattedNumber = '';
+
+        if (digits.length <= 3) {
+            formattedNumber = digits;
+        } else if (digits.length <= 6) {
+            formattedNumber = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+        } else {
+            formattedNumber = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+        }
+
+        input.value = formattedNumber;
+    }
+</script>
 </head>
 <body>
 <nav class="navbar">
@@ -123,7 +138,7 @@
         <div class="form-group row">
             <label class="col-4 col-form-label" for="tbEmail">Email</label>
             <div class="col-6">
-                <input type="email" class="form-control" id="tbEmail" name="email" placeholder="Entrez votre email" required>
+                <input type="email" class="form-control" id="tbEmail" name="courriel" placeholder="Entrez votre email" required>
             </div>
             <p id="errEmail" class="text-danger font-weight-bold"></p>
         </div>

@@ -1,77 +1,111 @@
 <?php
-// Inclure le fichier de connexion à la base de données
-include('db.php');
+// Inclure PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-$message = ""; // Initialiser le message
+require 'vendor/autoload.php'; // Assurez-vous que le chemin est correct
 
-// Vérifier si les données ont été envoyées
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupération et nettoyage des données du formulaire
-    $nom = isset($_POST['tbNom']) ? trim($_POST['tbNom']) : '';
-    $prenom = isset($_POST['tbPrenom']) ? trim($_POST['tbPrenom']) : '';
-    $email = isset($_POST['tbEmail']) ? filter_var(trim($_POST['tbEmail']), FILTER_SANITIZE_EMAIL) : '';
-    $telMaison = isset($_POST['tbTelM']) ? trim($_POST['tbTelM']) : '';
-    $telCellulaire = isset($_POST['tbTelC']) ? trim($_POST['tbTelC']) : '';
-    $posteBureau = isset($_POST['tbTelTPoste']) ? trim($_POST['tbTelTPoste']) : '';
-    $noEmp = isset($_POST['tbNoEmpl']) ? trim($_POST['tbNoEmpl']) : '';
-    $statut = isset($_POST['tbStatut']) ? trim($_POST['tbStatut']) : '';
+// Connexion à la base de données
+$servername = "localhost";
+$username = "root"; // Remplacez par votre nom d'utilisateur
+$password = ""; // Remplacez par votre mot de passe
+$dbname = "gestionannonces"; // Remplacez par le nom de votre base de données
 
-    // Validation des données
-    if (empty($noEmpl) || !is_numeric($noEmpl)) {
-        $message = "<div style='color: red;'>Erreur : Le numéro d'employé doit être un nombre entier.</div>";
-    } else {
-        // Préparer la requête SQL
-        $sql = "UPDATE utilisateurs SET 
-            Nom = ?, 
-            Prenom = ?, 
-            Courriel = ?, 
-            NoTelMaison = ?, 
-            NoTelCellulaire = ?, 
-            NoTelTravail = ?, 
-            Statut = ? 
-        WHERE NoEmpl = ?";
-var_dump($noEmpl);
-        // Préparer la requête
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) {
-            die("Erreur lors de la préparation de la requête: " . $conn->error);
-        }
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-        // Bind parameters
-        $stmt->bind_param("sssssssi", $nom, $prenom, $email, $telMaison, $telCellulaire, $posteBureau, $statut, $noEmp);
-
-        // Exécuter la requête
-        if ($stmt->execute()) {
-            $message = "Mise à jour réussie!";
-        } else {
-            $message = "<div style='color: red;'>Erreur lors de la mise à jour: " . $stmt->error . "</div>";
-        }
-
-        // Fermer la déclaration
-        $stmt->close();
-    }
+// Vérifiez la connexion
+if ($conn->connect_error) {
+    die("La connexion a échoué : " . $conn->connect_error);
 }
 
-// Fermer la connexion
+// Récupération des données du formulaire avec vérification
+$nom = isset($_POST['nom']) ? $_POST['nom'] : '';
+$prenom = isset($_POST['prenom']) ? $_POST['prenom'] : '';
+$courriel = isset($_POST['courriel']) ? $_POST['courriel'] : '';
+$noTelBureau = isset($_POST['NoTelBureau']) ? $_POST['NoTelBureau'] : '';
+$posteBureau = isset($_POST['PosteBureau']) ? $_POST['PosteBureau'] : '';
+$noTelMaison = isset($_POST['NoTelMaison']) ? $_POST['NoTelMaison'] : '';
+$noTelCellulaire = isset($_POST['NoTelCellulaire']) ? $_POST['NoTelCellulaire'] : '';
+$noEmpl = isset($_POST['NoEmpl']) ? $_POST['NoEmpl'] : '';
+$statut = isset($_POST['statut']) ? $_POST['statut'] : '';
+
+// Debugging: afficher les valeurs
+var_dump($nom, $prenom, $courriel, $noTelBureau, $posteBureau, $noTelMaison, $noTelCellulaire, $noEmpl, $statut);
+
+// Vérification des champs
+$champsVides = [];
+if (empty($nom)) $champsVides[] = 'nom';
+if (empty($prenom)) $champsVides[] = 'prenom';
+if (empty($courriel)) $champsVides[] = 'courriel';
+if (empty($noTelMaison)) $champsVides[] = 'NoTelMaison';
+if (empty($noTelCellulaire)) $champsVides[] = 'NoTelCellulaire';
+if (empty($noTelBureau)) $champsVides[] = 'NoTelBureau';
+if (empty($noEmpl)) $champsVides[] = 'NoEmpl';
+
+if (!empty($champsVides)) {
+    die("Les champs suivants doivent être remplis : " . implode(', ', $champsVides));
+}
+
+
+
+// Préparez la requête d'UPDATE
+$query = 'UPDATE utilisateurs SET Nom = ?, Prenom = ?, Courriel = ?, NoTelMaison = ?, NoTelCellulaire = ?, NoTelTravail = ?, Statut = 0 WHERE NoUtilisateur = ?';
+
+// Préparation de la requête
+$stmt = $conn->prepare($query);
+
+// Liez les paramètres
+$stmt->bind_param("ssssssi", $nom, $prenom, $courriel, $noTelMaison, $noTelCellulaire, $noTelTravail, $noUtilisateur);
+
+// Exécutez la requête
+if ($stmt->execute()) {
+    // Génération d'un token unique
+    $token = bin2hex(random_bytes(16));
+
+
+    var_dump($noUtilisateur);
+    // Mettez à jour le champ Token dans la base de données
+    $updateTokenQuery = 'UPDATE utilisateurs SET Token = ? WHERE NoUtilisateur = ?';
+    $stmtUpdateToken = $conn->prepare($updateTokenQuery);
+    $stmtUpdateToken->bind_param("si", $token, $noUtilisateur);
+    
+    if ($stmtUpdateToken->execute()) {
+        // Envoi de l'email de confirmation
+        $mail = new PHPMailer(true);
+        try {
+            // Paramètres du serveur
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com'; // Remplacez par votre serveur SMTP
+            $mail->SMTPAuth = true;
+            $mail->Username = 'zarajeanfabrice@gmail.com'; // Votre adresse email
+            $mail->Password = 'limhgqahfpchjnch'; // Votre mot de passe email
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // ou PHPMailer::ENCRYPTION_SMTPS si nécessaire
+            $mail->Port = 587;
+
+            // Destinataires
+            $mail->setFrom('from@example.com', 'Nom de l\'expéditeur');
+            $mail->addAddress($courriel); // Email de l'utilisateur
+
+            // Contenu de l'email
+            $mail->isHTML(true);
+            $mail->Subject = 'Confirmation de votre inscription';
+            $confirmationLink = "http://localhost/GestionAnnonces/confirmation.php?token=" . $token; // Lien de confirmation avec le token
+            $mail->Body = "Merci de vous être inscrit! Cliquez sur le lien pour confirmer votre compte : <a href='$confirmationLink'>Confirmer mon compte</a>";
+
+            $mail->send();
+            echo 'Email de confirmation envoyé!';
+        } catch (Exception $e) {
+            echo "L'email n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+        }
+    } else {
+        echo "Erreur lors de la mise à jour du token: " . $stmtUpdateToken->error;
+    }
+} else {
+    echo "Erreur lors de la mise à jour: " . $stmt->error;
+}
+
+// Fermez la connexion
+$stmt->close();
+$stmtUpdateToken->close();
 $conn->close();
 ?>
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mise à jour de Profil</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <nav class="navbar">
-        <a href="login.php" class="nav-item">Se connecter</a>
-    </nav>
-
-    <div>
-        <!-- Affichage du message de succès ou d'erreur -->
-        <?php if (!empty($message)) echo $message; ?>
-    </div>
-</body>
-</html>
