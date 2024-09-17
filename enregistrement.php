@@ -33,14 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $courriel = filter_var(trim($_POST['courriel']), FILTER_SANITIZE_EMAIL);
     $mot_de_passe = $_POST['password1'];
     $mot_de_passe_confirmation = $_POST['password2']; // Champ de confirmation
-    $nom = trim($_POST['nom']);
-    $prenom = trim($_POST['prenom']);
-    $noTelMaison = trim($_POST['noTelMaison']);
-    $noTelTravail = trim($_POST['noTelTravail']);
-    $noTelCellulaire = trim($_POST['noTelCellulaire']);
-    
+
     // Vérifiez si les champs sont vides
-    if (empty($courriel) || empty($mot_de_passe) || empty($mot_de_passe_confirmation) || empty($nom) || empty($prenom) || empty($noTelMaison) || empty($noTelTravail) || empty($noTelCellulaire)) {
+    if (empty($courriel) || empty($mot_de_passe) || empty($mot_de_passe_confirmation)) {
         $errors[] = ERROR_EMPTY_FIELDS;
     }
 
@@ -76,19 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
         $token = bin2hex(random_bytes(16));
 
-        // Déterminer le statut (admin ou utilisateur normal)
-        $statut = 0; // Par défaut, statut utilisateur normal
-        if (isset($_POST['isAdmin']) && $_POST['isAdmin'] === '1' && $courriel === 'admin@gmail.com') {
-            $statut = 1; // 1 pour admin
-        }
-
-        // Insérer les données dans la base de données
-        $query = "INSERT INTO utilisateurs (Courriel, MotDePasse, Nom, Prenom, Statut, Token, NoTelMaison, NoTelTravail, NoTelCellulaire)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // Insérer les données dans la base de données uniquement avec le courriel et le mot de passe
+        $query = "INSERT INTO utilisateurs (Courriel, MotDePasse, Token)
+                  VALUES (?, ?, ?)";
         $stmt = $conn->prepare($query);
-
+        
         // Lier les variables qui correspondent aux paramètres de la requête
-        $stmt->bind_param("sssssssss", $courriel, $hashed_password, $nom, $prenom, $statut, $token, $noTelMaison, $noTelTravail, $noTelCellulaire);
+        $stmt->bind_param("sss", $courriel, $hashed_password, $token);
 
         // Exécuter la requête
         if ($stmt->execute()) {
@@ -111,14 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Contenu du message de confirmation à l'utilisateur
                 $mail->isHTML(true);
                 $mail->Subject = 'Confirmation de votre inscription';
-                $mail->Body    = "Bonjour $nom $prenom,<br><br>Merci pour votre inscription ! Veuillez confirmer votre adresse courriel en cliquant sur le lien suivant :<br><br>
+                $mail->Body    = "Bonjour,<br><br>Merci pour votre inscription ! Veuillez confirmer votre adresse courriel en cliquant sur le lien suivant :<br><br>
                 <a href='http://localhost/GestionAnnonces/confirmation.php?token=$token'>Confirmer votre compte</a><br><br>Si vous n'avez pas créé ce compte, ignorez ce courriel.";
                 
                 $mail->send();
 
                 // Stocker un message de succès dans la session pour affichage
-                $_SESSION['success'] = ($statut === 1) ? SUCCESS_ADMIN_REGISTRATION : SUCCESS_REGISTRATION;
-                $_SESSION['isAdmin'] = $statut === 1; // Stocker le statut dans la session pour l'affichage
+                $_SESSION['success'] = SUCCESS_REGISTRATION;
 
             } catch (Exception $e) {
                 $_SESSION['error'] = "Le courriel n'a pas pu être envoyé. Erreur : " . $mail->ErrorInfo;
