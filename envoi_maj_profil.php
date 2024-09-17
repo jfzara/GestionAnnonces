@@ -1,76 +1,72 @@
 <?php
-require_once 'db.php';
 session_start();
+require 'vendor/autoload.php'; // Inclure le fichier autoload
 
-// Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['NoUtilisateur'])) {
-    echo "Vous devez être connecté pour mettre à jour votre profil.";
-    exit();
-}
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-$userId = $_SESSION['NoUtilisateur'];
+// Inclure la configuration de la base de données
+include('config.php'); 
+
 $message = ""; // Initialiser le message
-
-// Afficher l'ID utilisateur pour le débogage
-var_dump("User ID: ", $userId);
 
 // Vérifiez si le formulaire a été soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupérer et valider les données
-    $email = filter_var(trim($_POST['tbEmail']), FILTER_SANITIZE_EMAIL);
-    $nom = trim($_POST['tbNom']);
-    $prenom = trim($_POST['tbPrenom']);
-    $noEmp = trim($_POST['tbNoEmp']);
-    $posteTelBureau = trim($_POST['tbTelTPoste']);
-    $telMaison = trim($_POST['tbTelM']);
-    $telCellulaire = trim($_POST['tbTelC']);
-    $statut = trim($_POST['tbStatut']);
+    // Vérification de l'existence des champs du formulaire
+    $nom = isset($_POST['tbNom']) ? trim($_POST['tbNom']) : '';
+    $prenom = isset($_POST['tbPrenom']) ? trim($_POST['tbPrenom']) : '';
+    $email = isset($_POST['tbEmail']) ? filter_var(trim($_POST['tbEmail']), FILTER_SANITIZE_EMAIL) : '';
+    $password = isset($_POST['tbPassword']) ? trim($_POST['tbPassword']) : '';
 
-    // Afficher les données récupérées pour le débogage
-    var_dump("POST data: ", $_POST);
-
-    // Vérification des informations requises
-    if (empty($nom) || empty($prenom) || empty($email) || empty($statut)) {
-        $message = "<div style='color: red;'>Tous les champs requis doivent être remplis.</div>";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    // Vérification de l'e-mail
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $message = "<div style='color: red;'>Email invalide.</div>";
     } else {
-        // Requête de mise à jour
-        $query = 'UPDATE utilisateurs SET
-            Nom = ?,
-            Prenom = ?,
-            Courriel = ?,         
-            NoTelMaison = ?,
-            NoTelCellulaire = ?,
-            NoTelTravail = ?,
-            Statut = ?
-            WHERE NoUtilisateur = ?';
+        // Générer un token de confirmation
+        $token = bin2hex(random_bytes(16)); // Générez un token aléatoire de 32 caractères
 
+        // Requête d'insertion
+        $query = 'INSERT INTO utilisateurs (Nom, Prenom, Courriel, MotDePasse, Statut, Token) VALUES (?, ?, ?, ?, 0, ?)';
         $stmt = $conn->prepare($query);
 
-        // Afficher si la préparation de la requête a réussi
-        var_dump("Statement preparation: ", $stmt ? 'Success' : 'Failed');
-
         if ($stmt) {
-            $stmt->bind_param('sssssssi', $nom, $prenom, $email, $telMaison, $telCellulaire, $posteTelBureau, $statut, $userId);
+            // Hash du mot de passe avant de le stocker
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $stmt->bind_param('sssss', $nom, $prenom, $email, $hashedPassword, $token);
             
-            // Afficher les valeurs liées pour le débogage
-            var_dump("Bound parameters: ", [$nom, $prenom, $email, $telMaison, $telCellulaire, $posteTelBureau, $statut, $userId]);
-
             if ($stmt->execute()) {
-                $message = "<div style='color: green;'>Profil mis à jour avec succès.</div>";
-                // Rediriger après une mise à jour réussie
-                header("Location: modifier_profil.php?message=" . urlencode($message));
-                exit();
+                // Envoi de l'e-mail de confirmation
+                $mail = new PHPMailer(); // Utilisez cette ligne
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com'; // Remplacez par votre hôte SMTP
+                $mail->SMTPAuth = true;
+                $mail->Username = 'zarajeanfabrice@gmail.com'; // Votre adresse e-mail
+                $mail->Password = 'lybddpkiorncgsxs'; // Votre mot de passe
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                // Destinataires
+                $mail->setFrom('your_email@example.com', 'Nom de votre application');
+                $mail->addAddress($email);
+
+                // Contenu
+                $mail->isHTML(true);
+                $mail->Subject = 'Confirmation de votre compte';
+                $mail->Body    = "Bonjour $prenom,<br><br>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour confirmer votre compte :<br><a href='http://yourdomain.com/confirmation.php?token=$token'>Confirmer mon compte</a>";
+
+                if ($mail->send()) {
+                    // Message de succès
+                    $message = "Pour confirmer votre inscription, veuillez cliquer sur le lien envoyé à <strong>$email</strong>.";
+                } else {
+                    $message = "<div style='color: red;'>Erreur lors de l'envoi de l'e-mail de confirmation.</div>";
+                }
             } else {
-                $message = "<div style='color: red;'>Erreur lors de la mise à jour du profil : " . $stmt->error . "</div>";
-                var_dump("Execute error: ", $stmt->error);
+                $message = "<div style='color: red;'>Erreur lors de l'enregistrement : " . $stmt->error . "</div>";
             }
-            
+
             $stmt->close();
         } else {
             $message = "<div style='color: red;'>Erreur lors de la préparation de la requête : " . $conn->error . "</div>";
-            var_dump("Connection error: ", $conn->error);
         }
     }
 }
@@ -84,15 +80,12 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifier Profil</title>
-    <link rel="stylesheet" href="styles.css">  
+    <title>Inscription</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <nav class="navbar">
-        <a href="annonces.php" class="nav-item">Annonces</a>
-        <a href="gestion_annonces.php" class="nav-item">Gestion de vos annonces</a>
-        <a href="modifier_profil.php" class="nav-item">Modification du profil</a>
-        <a href="logout.php" class="nav-item">Déconnexion</a>
+        <a href="login.php" class="nav-item">Se connecter</a>
     </nav>
 
     <div>
@@ -101,3 +94,4 @@ $conn->close();
     </div>
 </body>
 </html>
+ 
