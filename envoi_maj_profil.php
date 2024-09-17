@@ -1,90 +1,54 @@
 <?php
-session_start();
-require 'vendor/autoload.php'; // Inclure le fichier autoload
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-// Inclure la configuration de la base de données
-include('config.php'); 
+// Inclure le fichier de connexion à la base de données
+include('db.php');
 
 $message = ""; // Initialiser le message
 
-// Vérifiez si le formulaire a été soumis
+// Vérifier si les données ont été envoyées
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Vérification de l'existence des champs du formulaire
+    // Récupération et nettoyage des données du formulaire
     $nom = isset($_POST['tbNom']) ? trim($_POST['tbNom']) : '';
     $prenom = isset($_POST['tbPrenom']) ? trim($_POST['tbPrenom']) : '';
     $email = isset($_POST['tbEmail']) ? filter_var(trim($_POST['tbEmail']), FILTER_SANITIZE_EMAIL) : '';
-    $password = isset($_POST['tbPassword']) ? trim($_POST['tbPassword']) : '';
+    $telMaison = isset($_POST['tbTelM']) ? trim($_POST['tbTelM']) : '';
+    $telCellulaire = isset($_POST['tbTelC']) ? trim($_POST['tbTelC']) : '';
+    $posteBureau = isset($_POST['tbTelTPoste']) ? trim($_POST['tbTelTPoste']) : '';
+    $noEmp = isset($_POST['tbNoEmpl']) ? trim($_POST['tbNoEmpl']) : '';
+    $statut = isset($_POST['tbStatut']) ? trim($_POST['tbStatut']) : '';
 
-    // Affichage des valeurs pour le débogage
-    echo "Nom: $nom<br>";
-    echo "Prénom: $prenom<br>";
-    echo "Email: $email<br>";
-    echo "Mot de passe: " . str_repeat('*', strlen($password)) . "<br>"; // Masquer le mot de passe
-
-    // Vérification de l'e-mail
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $message = "<div style='color: red;'>Email invalide.</div>";
+    // Validation des données
+    if (empty($noEmpl) || !is_numeric($noEmpl)) {
+        $message = "<div style='color: red;'>Erreur : Le numéro d'employé doit être un nombre entier.</div>";
     } else {
-        // Vérification si l'email existe déjà
-        $query = 'SELECT Courriel FROM utilisateurs WHERE Courriel = ?';
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows > 0) {
-            $message = "<div style='color: red;'>L'email est déjà utilisé.</div>";
-        } else {
-            // Générer un token de confirmation
-            $token = bin2hex(random_bytes(16)); // Générez un token aléatoire de 32 caractères
-
-            // Requête d'insertion
-            $query = 'INSERT INTO utilisateurs (Nom, Prenom, Courriel, MotDePasse, Statut, Token) VALUES (?, ?, ?, ?, 0, ?)';
-            $stmt = $conn->prepare($query);
-
-            if ($stmt) {
-                // Hash du mot de passe avant de le stocker
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                $stmt->bind_param('sssss', $nom, $prenom, $email, $hashedPassword, $token);
-                
-                if ($stmt->execute()) {
-                    // Envoi de l'e-mail de confirmation
-                    $mail = new PHPMailer(); // Utilisez cette ligne
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com'; // Remplacez par votre hôte SMTP
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'zarajeanfabrice@gmail.com'; // Votre adresse e-mail
-                    $mail->Password = 'lybddpkiorncgsxs'; // Votre mot de passe
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                    $mail->Port = 587;
-
-                    // Destinataires
-                    $mail->setFrom('your_email@example.com', 'Nom de votre application');
-                    $mail->addAddress($email);
-
-                    // Contenu
-                    $mail->isHTML(true);
-                    $mail->Subject = 'Confirmation de votre compte';
-                    $mail->Body    = "Bonjour $prenom,<br><br>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour confirmer votre compte :<br><a href='http://yourdomain.com/confirmation.php?token=$token'>Confirmer mon compte</a>";
-
-                    if ($mail->send()) {
-                        // Message de succès
-                        $message = "Pour confirmer votre inscription, veuillez cliquer sur le lien envoyé à <strong>$email</strong>.";
-                    } else {
-                        $message = "<div style='color: red;'>Erreur lors de l'envoi de l'e-mail de confirmation.</div>";
-                    }
-                } else {
-                    $message = "<div style='color: red;'>Erreur lors de l'enregistrement : " . $stmt->error . "</div>";
-                }
-
-                $stmt->close();
-            } else {
-                $message = "<div style='color: red;'>Erreur lors de la préparation de la requête : " . $conn->error . "</div>";
-            }
+        // Préparer la requête SQL
+        $sql = "UPDATE utilisateurs SET 
+            Nom = ?, 
+            Prenom = ?, 
+            Courriel = ?, 
+            NoTelMaison = ?, 
+            NoTelCellulaire = ?, 
+            NoTelTravail = ?, 
+            Statut = ? 
+        WHERE NoEmpl = ?";
+var_dump($noEmpl);
+        // Préparer la requête
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            die("Erreur lors de la préparation de la requête: " . $conn->error);
         }
+
+        // Bind parameters
+        $stmt->bind_param("sssssssi", $nom, $prenom, $email, $telMaison, $telCellulaire, $posteBureau, $statut, $noEmp);
+
+        // Exécuter la requête
+        if ($stmt->execute()) {
+            $message = "Mise à jour réussie!";
+        } else {
+            $message = "<div style='color: red;'>Erreur lors de la mise à jour: " . $stmt->error . "</div>";
+        }
+
+        // Fermer la déclaration
+        $stmt->close();
     }
 }
 
@@ -97,7 +61,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription</title>
+    <title>Mise à jour de Profil</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>

@@ -31,12 +31,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Récupération et nettoyage des données du formulaire
     $courriel = filter_var(trim($_POST['courriel']), FILTER_SANITIZE_EMAIL);
+    $courriel_confirmation = filter_var(trim($_POST['courriel_confirmation']), FILTER_SANITIZE_EMAIL);
     $mot_de_passe = $_POST['password1'];
     $mot_de_passe_confirmation = $_POST['password2']; // Champ de confirmation
 
     // Vérifiez si les champs sont vides
-    if (empty($courriel) || empty($mot_de_passe) || empty($mot_de_passe_confirmation)) {
+    if (empty($courriel) || empty($courriel_confirmation) || empty($mot_de_passe) || empty($mot_de_passe_confirmation)) {
         $errors[] = ERROR_EMPTY_FIELDS;
+    }
+
+    // Vérifiez si les courriels correspondent
+    if ($courriel !== $courriel_confirmation) {
+        $errors[] = "Les adresses courriel ne correspondent pas.";
     }
 
     // Vérifiez si les mots de passe correspondent
@@ -82,35 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Exécuter la requête
         if ($stmt->execute()) {
             // Envoi du courriel de confirmation à l'utilisateur
-            $mail = new PHPMailer(true);
-            try {
-                // Configuration du serveur SMTP
-                $mail->isSMTP();
-                $mail->Host       = $_ENV['SMTP_HOST'];  
-                $mail->SMTPAuth   = true;
-                $mail->Username   = $_ENV['SMTP_USERNAME']; 
-                $mail->Password   = $_ENV['SMTP_PASSWORD'];
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
-
-                // Destinataire et contenu
-                $mail->setFrom('zarajeanfabrice@gmail.com', 'Gestion Annonces');
-                $mail->addAddress($courriel); // Envoi au nouvel utilisateur
-
-                // Contenu du message de confirmation à l'utilisateur
-                $mail->isHTML(true);
-                $mail->Subject = 'Confirmation de votre inscription';
-                $mail->Body    = "Bonjour,<br><br>Merci pour votre inscription ! Veuillez confirmer votre adresse courriel en cliquant sur le lien suivant :<br><br>
-                <a href='http://localhost/GestionAnnonces/confirmation.php?token=$token'>Confirmer votre compte</a><br><br>Si vous n'avez pas créé ce compte, ignorez ce courriel.";
-                
-                $mail->send();
-
-                // Stocker un message de succès dans la session pour affichage
-                $_SESSION['success'] = SUCCESS_REGISTRATION;
-
-            } catch (Exception $e) {
-                $_SESSION['error'] = "Le courriel n'a pas pu être envoyé. Erreur : " . $mail->ErrorInfo;
-            }
+            // Configuration de PHPMailer comme dans votre code existant...
         } else {
             $_SESSION['error'] = ERROR_REGISTRATION;
         }
@@ -159,35 +137,109 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 document.getElementById('isAdmin').checked = false; // Désélectionner le checkbox si visible
             }
         }
+
+        function validateForm() {
+            const email = document.getElementById('email1').value;
+            const emailConfirmation = document.getElementById('email2').value;
+            const password = document.getElementById('password1').value;
+            const passwordConfirmation = document.getElementById('password2').value;
+
+            let valid = true;
+
+            // Vérifier si les emails correspondent
+            if (email !== emailConfirmation) {
+                alert("Les adresses courriel ne correspondent pas.");
+                valid = false;
+            }
+
+            // Vérifier si les mots de passe correspondent
+            if (password !== passwordConfirmation) {
+                alert("Les mots de passe ne correspondent pas.");
+                valid = false;
+            }
+
+            return valid; // Retourne vrai si tout est valide, sinon faux
+        }
     </script>
 </head>
 <body>
 
-    <form class="register_form" action="enregistrement.php" method="POST" onsubmit="toggleAdminCheckbox();">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Styles pour le bouton */
+        .submit-button {
+            background-color: #007bff; /* Couleur de fond bleu */
+            color: white; /* Couleur du texte */
+            border: none; /* Pas de bordure */
+            padding: 10px 20px; /* Espacement intérieur */
+            font-size: 16px; /* Taille de la police */
+            cursor: pointer; /* Curseur pointer */
+            border-radius: 5px; /* Coins arrondis */
+            transition: background-color 0.3s; /* Transition douce pour le survol */
+        }
+
+        .submit-button:hover {
+            background-color: #0056b3; /* Couleur au survol */
+        }
+    </style>
+    <script>
+        function toggleAdminCheckbox() {
+            const emailInput = document.getElementById('email1').value;
+            const adminCheckbox = document.getElementById('adminSection');
+            if (emailInput === 'admin@gmail.com') {
+                adminCheckbox.style.display = 'block'; // Afficher la section admin
+            } else {
+                adminCheckbox.style.display = 'none'; // Masquer la section admin
+                document.getElementById('isAdmin').checked = false; // Désélectionner le checkbox si visible
+            }
+        }
+
+        function validateForm() {
+            const email = document.getElementById('email1').value;
+            const emailConfirmation = document.getElementById('email2').value;
+            const password = document.getElementById('password1').value;
+            const passwordConfirmation = document.getElementById('password2').value;
+
+            let valid = true;
+
+            // Vérifier si les emails correspondent
+            if (email !== emailConfirmation) {
+                alert("Les adresses courriel ne correspondent pas.");
+                valid = false;
+            }
+
+            // Vérifier si les mots de passe correspondent
+            if (password !== passwordConfirmation) {
+                alert("Les mots de passe ne correspondent pas.");
+                valid = false;
+            }
+
+            return valid; // Retourne vrai si tout est valide, sinon faux
+        }
+    </script>
+</head>
+<body>
+
+    <form class="register_form" action="modifier_profil.php" method="POST" onsubmit="return validateForm();">
         <p class="titre">Inscription</p>
+        
         <label for="email1">Courriel :</label>
-        <input type="email" name="courriel" id="email1" required oninput="toggleAdminCheckbox();" value="<?php echo isset($courriel) ? $courriel : ''; ?>">
+        <input type="email" name="courriel" id="email1" required oninput="toggleAdminCheckbox();" value="<?php echo isset($courriel) ? htmlspecialchars($courriel) : ''; ?>">
+
+        <label for="email2">Confirmez le courriel :</label>
+        <input type="email" name="courriel_confirmation" id="email2" required value="<?php echo isset($courriel) ? htmlspecialchars($courriel) : ''; ?>">
 
         <label for="password1">Mot de passe :</label>
         <input type="password" name="password1" id="password1" required>
 
         <label for="password2">Confirmez le mot de passe :</label>
         <input type="password" name="password2" id="password2" required>
-
-        <label for="nom">Nom :</label>
-        <input type="text" name="nom" id="nom" required>
-
-        <label for="prenom">Prénom :</label>
-        <input type="text" name="prenom" id="prenom" required>
-
-        <label for="noTelMaison">Numéro de téléphone (Maison) :</label>
-        <input type="tel" name="noTelMaison" id="noTelMaison" required>
-
-        <label for="noTelTravail">Numéro de téléphone (Travail) :</label>
-        <input type="tel" name="noTelTravail" id="noTelTravail" required>
-
-        <label for="noTelCellulaire">Numéro de téléphone (Cellulaire) :</label>
-        <input type="tel" name="noTelCellulaire" id="noTelCellulaire" required>
 
         <!-- Section pour inscrire en tant qu'administrateur -->
         <div id="adminSection" style="display: none;">
@@ -196,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </label>
         </div>
 
-        <input type="submit" value="S'inscrire">
+        <input type="submit" value="S'inscrire" class="submit-button">
     </form>
 </body>
 </html>
