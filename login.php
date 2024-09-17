@@ -1,5 +1,4 @@
 <?php
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
@@ -44,8 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
 
             // Récupérer l'ID de la connexion
-            $NoConnexion = $conn->insert_id;
-            $_SESSION['NoConnexion'] = $NoConnexion; // Stocker l'ID de la connexion dans la session
+            $_SESSION['NoConnexion'] = $conn->insert_id; // Stocker l'ID de la connexion dans la session
 
             // Enregistrer l'ID de l'utilisateur dans la session
             $_SESSION['NoUtilisateur'] = $user['NoUtilisateur'];
@@ -65,6 +63,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Affichage des messages d'erreur
+if (isset($_SESSION['error'])) {
+    $error_message = $_SESSION['error'];
+    unset($_SESSION['error']);
+}
 ?>
 
 <!DOCTYPE html>
@@ -132,9 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div id="errorMessages" style="color:red;">
             <?php
             // Affichage des messages d'erreur
-            if (isset($_SESSION['error'])) {
-                echo $_SESSION['error'];
-                unset($_SESSION['error']);
+            if (isset($error_message)) {
+                echo $error_message;
             }
             ?>
         </div>

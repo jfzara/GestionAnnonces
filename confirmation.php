@@ -15,10 +15,11 @@ if (isset($_GET['token'])) {
         // Mettre à jour le statut de l'utilisateur à 9 (confirmé)
         $stmt = $conn->prepare("UPDATE utilisateurs SET Statut = 9 WHERE Token = ?");
         $stmt->bind_param("s", $token);
+        
         if ($stmt->execute()) {
             $_SESSION['success'] = "Votre compte a été confirmé avec succès.";
         } else {
-            $_SESSION['error'] = "Erreur lors de la confirmation de votre compte.";
+            $_SESSION['error'] = "Erreur lors de la confirmation de votre compte. Veuillez réessayer.";
         }
     } else {
         $_SESSION['error'] = "Token invalide ou déjà utilisé.";
