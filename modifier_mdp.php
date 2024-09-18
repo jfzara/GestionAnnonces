@@ -1,4 +1,21 @@
+<?php
+// Démarrer la session
+session_start();
 
+// Inclure le fichier de connexion à la base de données
+require 'db.php'; // Assurez-vous que ce fichier contient la bonne connexion MySQL
+
+// Variables pour stocker les messages d'erreur ou de succès
+$error = "";
+$success = "";
+
+// Message de débogage pour vérifier la session
+if (isset($_SESSION['user_id'])) {
+    echo "Session démarrée pour l'utilisateur ID : " . $_SESSION['user_id'];
+} else {
+    echo "Aucun utilisateur connecté.";
+}
+?>
 
 <!DOCTYPE html>
 <html lang="fr">

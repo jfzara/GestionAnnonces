@@ -26,7 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $noTelMaison = htmlspecialchars($_POST['NoTelMaison'] ?? '');
     $noTelTravail = htmlspecialchars($_POST['NoTelTravail'] ?? '');
     $noTelCellulaire = htmlspecialchars($_POST['NoTelCellulaire'] ?? '');
-    $NoEmpl = isset($_POST['NoEmpl']) ? htmlspecialchars($_POST['NoEmpl']) : null;
+    
+    // Si NoEmpl est vide, le remplacer par NULL
+    $NoEmpl = isset($_POST['NoEmpl']) && !empty($_POST['NoEmpl']) ? htmlspecialchars($_POST['NoEmpl']) : NULL;
 
     // Validation des champs
     $champsVides = [];
