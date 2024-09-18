@@ -1,44 +1,4 @@
-<?php
-session_start();
-$error = '';
-$success = '';
 
-// Supposons que vous ayez une fonction pour obtenir l'utilisateur
-// $user = getUserById($_SESSION['user_id']);
-$user = [
-    'id' => 1, // Remplacez ceci par l'ID réel de l'utilisateur
-    'password' => password_hash('ancienMotDePasse', PASSWORD_DEFAULT) // Remplacez ceci par le mot de passe réel
-];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Récupération des données du formulaire
-    $currentPassword = $_POST['currentPassword'];
-    $newPassword = $_POST['newPassword'];
-    $confirmPassword = $_POST['confirmPassword'];
-
-    // Validation des champs
-    if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
-        $error = 'Les champs suivants doivent être remplis : mot de passe actuel, nouveau mot de passe, et confirmation du mot de passe.';
-    } elseif ($newPassword !== $confirmPassword) {
-        $error = 'Les nouveaux mots de passe ne correspondent pas.';
-    } elseif (strlen($newPassword) < 6) {
-        $error = 'Le mot de passe doit contenir au moins 6 caractères.';
-    } else {
-        // Vérification du mot de passe actuel
-        if (password_verify($currentPassword, $user['password'])) {
-            // Mettre à jour le mot de passe
-            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-            // Remplacez cette fonction par la logique réelle pour mettre à jour le mot de passe dans la base de données
-            // updateUserPassword($user['id'], $hashedPassword);
-
-            // Pour cet exemple, nous allons juste simuler le succès
-            $success = 'Votre mot de passe a été mis à jour avec succès.';
-        } else {
-            $error = 'Le mot de passe actuel est incorrect.';
-        }
-    }
-}
-?>
 
 <!DOCTYPE html>
 <html lang="fr">

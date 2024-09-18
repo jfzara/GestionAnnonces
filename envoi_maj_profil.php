@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 $mail->setFrom('no-reply@example.com', 'Gestion Annonces');
                 $mail->addAddress($courriel);
-                $mail->Subject = 'Confirmation de mise à jour';
+                $mail->Subject = 'Confirmation';
                 $mail->isHTML(true);
                 $mail->Body = "Merci pour votre mise à jour! Pour confirmer votre compte, veuillez cliquer sur le lien suivant : <a href='$lienConfirmation'>Confirmer</a>";
 
@@ -101,12 +101,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-<!-- Affichage du message de confirmation et du formulaire -->
-<div style="margin-bottom: 20px;">
+<!-- Affichage du message de confirmation -->
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
     <?php if (isset($_SESSION['message'])): ?>
-        <div style="color: green;">
+        <div style="background-color: white; padding: 3rem; text-align: center; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
             <?php echo $_SESSION['message']; ?>
-            <?php unset($_SESSION['message']); ?>
+            <?php unset($_SESSION['message']); // Supprimer le message après l'affichage ?>
         </div>
     <?php endif; ?>
 </div>
