@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db.php'; // Incluez votre fichier de connexion à la base de données
+include 'db.php'; // Inclusion du fichier de connexion à la base de données
 
 if (isset($_GET['token'])) {
     $token = $_GET['token'];
@@ -14,23 +14,31 @@ if (isset($_GET['token'])) {
     if ($result->num_rows > 0) {
         // Token valide
         $user = $result->fetch_assoc();
-        echo "Token valide. Action confirmée.<br>";
 
-        // Mettez à jour le statut de l'utilisateur à 9 (Confirmé)
-        $updateStatutQuery = 'UPDATE utilisateurs SET Statut = 9 WHERE Token = ?';
-        $stmtUpdateStatut = $conn->prepare($updateStatutQuery);
-        $stmtUpdateStatut->bind_param("s", $token);
-
-        if ($stmtUpdateStatut->execute()) {
-            echo "Votre compte a été confirmé avec succès!";
+        // Vérifiez si l'utilisateur est déjà confirmé
+        if ($user['Statut'] == 9) {
+            echo "Votre compte est déjà confirmé.";
         } else {
-            echo "Erreur lors de la confirmation du compte: " . $stmtUpdateStatut->error;
-        }
+            // Mettez à jour le statut de l'utilisateur à 9 (Confirmé)
+            $updateStatutQuery = 'UPDATE utilisateurs SET Statut = 9 WHERE Token = ?';
+            $stmtUpdateStatut = $conn->prepare($updateStatutQuery);
+            $stmtUpdateStatut->bind_param("s", $token);
 
-        $stmtUpdateStatut->close();
+            if ($stmtUpdateStatut->execute()) {
+                // Compte confirmé avec succès, redirection vers la page de login
+                echo "Votre compte a été confirmé avec succès. Vous allez être redirigé vers la page de connexion.";
+                header("Refresh: 3; url=login.php"); // Redirection après 3 secondes
+                exit(); // Stopper l'exécution après la redirection
+            } else {
+                // Affiche un message générique d'erreur
+                echo "Une erreur est survenue lors de la confirmation du compte. Veuillez réessayer plus tard.";
+            }
+
+            $stmtUpdateStatut->close();
+        }
     } else {
-        // Token invalide
-        echo "Token invalide.";
+        // Token invalide ou déjà utilisé
+        echo "Token invalide ou déjà utilisé.";
     }
 
     $stmt->close();

@@ -1,12 +1,23 @@
-<?php 
+<?php
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require 'vendor/autoload.php';  
 
-session_start(); // Démarrer la session au début
+session_start(); // Démarrer la session
 
-// Charger les variables d'environnement à partir du fichier .env + gestion si .env est introuvable
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $motDePasse = $_POST['motDePasse'];
+
+    // Stocker le mot de passe dans la session
+    $_SESSION['motDePasse'] = $motDePasse;
+
+    // Rediriger vers la page de modification du profil
+    header("Location: modifier_profil.php");
+    exit();
+}
+
+// Charger les variables d'environnement à partir du fichier .env et gérer les erreurs
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 try {
     $dotenv->load();
@@ -14,17 +25,17 @@ try {
     die("Le fichier .env est introuvable ou ne peut pas être lu : " . $e->getMessage());
 }
 
-include('config.php'); // Inclure le fichier de configuration pour la connexion à la base de données
-$mail = new PHPMailer();
+include('config.php'); // Inclure la connexion à la base de données
+
+// Initialisation des constantes pour les messages
 const ERROR_EMAIL_USED = "Cette adresse courriel est déjà utilisée.";
 const ERROR_PASSWORD_MISMATCH = "Les mots de passe ne correspondent pas.";
 const ERROR_PASSWORD_INVALID = "Le mot de passe doit comporter entre 5 et 15 caractères, inclure des lettres (majuscules et minuscules) et des chiffres.";
 const ERROR_EMPTY_FIELDS = "Veuillez remplir tous les champs obligatoires.";
 const ERROR_REGISTRATION = "Erreur lors de l'enregistrement.";
 const SUCCESS_REGISTRATION = "Enregistrement réussi. Veuillez vérifier votre courriel pour confirmer votre inscription.";
-const SUCCESS_ADMIN_REGISTRATION = "Enregistrement réussi en tant que ADMINISTRATEUR."; // Message de succès pour les admins
 
-// Vérifiez si la méthode de la requête est POST
+// Vérifier si la méthode de la requête est POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Initialisation des messages d'erreur
     $errors = [];
@@ -32,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupération et nettoyage des données du formulaire
     $courriel = filter_var(trim($_POST['courriel']), FILTER_SANITIZE_EMAIL);
     $courriel_confirmation = filter_var(trim($_POST['courriel_confirmation']), FILTER_SANITIZE_EMAIL);
-    $mot_de_passe = $_POST['password1'];
-    $mot_de_passe_confirmation = $_POST['password2']; // Champ de confirmation
+    $mot_de_passe = $_POST['motDePasse'];
+    $mot_de_passe_confirmation = $_POST['confirm_password'];
 
     // Vérifiez si les champs sont vides
     if (empty($courriel) || empty($courriel_confirmation) || empty($mot_de_passe) || empty($mot_de_passe_confirmation)) {
@@ -58,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = ERROR_PASSWORD_INVALID;
     }
 
-    // Vérification de l'existence de l'email
+    // Vérifier l'existence de l'email dans la base de données
     $stmt = $conn->prepare("SELECT * FROM utilisateurs WHERE Courriel = ?");
     $stmt->bind_param("s", $courriel);
     $stmt->execute();
@@ -69,42 +80,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = ERROR_EMAIL_USED;
     }
 
+    // Si aucune erreur, procéder à l'inscription
     if (empty($errors)) {
-        // Hachage du mot de passe
         $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
-    
-        // Insérer les données dans la base de données uniquement avec le courriel et le mot de passe
         $query = "INSERT INTO utilisateurs (Courriel, MotDePasse) VALUES (?, ?)";
         $stmt = $conn->prepare($query);
-        
-        // Lier les variables qui correspondent aux paramètres de la requête
         $stmt->bind_param("ss", $courriel, $hashed_password);
-    
-        // Exécuter la requête
+
         if ($stmt->execute()) {
-            // Envoi du courriel de confirmation à l'utilisateur
-            // Configuration de PHPMailer comme dans votre code existant...
+            $_SESSION['success'] = SUCCESS_REGISTRATION;
         } else {
             $_SESSION['error'] = ERROR_REGISTRATION;
         }
+    } else {
+        $_SESSION['errors'] = $errors;
     }
+
     $stmt->close();
     $conn->close();
 }
 ?>
 
-<!-- Affichage du message de succès avec un bouton de connexion -->
+<!-- Affichage des messages -->
 <?php if (isset($_SESSION['success'])): ?>
     <div class="alert alert-success">
         <?php echo $_SESSION['success']; ?>
-        <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin']): ?>
-            <br><a href="login.php" class="btn btn-primary">Connexion</a>
-        <?php endif; ?>
+        <a href="login.php" class="btn btn-primary">Connexion</a>
     </div>
     <?php unset($_SESSION['success']); ?>
 <?php endif; ?>
 
-<!-- Affichage des messages d'erreur -->
 <?php if (isset($_SESSION['errors'])): ?>
     <div class="alert alert-danger">
         <?php foreach ($_SESSION['errors'] as $error): ?>
@@ -121,129 +126,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription</title>
     <link rel="stylesheet" href="styles.css">
-    <script>
-        function toggleAdminCheckbox() {
-            const emailInput = document.getElementById('email1').value;
-            const adminCheckbox = document.getElementById('adminSection');
-            if (emailInput === 'admin@gmail.com') {
-                adminCheckbox.style.display = 'block'; // Afficher la section admin
-            } else {
-                adminCheckbox.style.display = 'none'; // Masquer la section admin
-                document.getElementById('isAdmin').checked = false; // Désélectionner le checkbox si visible
-            }
-        }
-
-        function validateForm() {
-            const email = document.getElementById('email1').value;
-            const emailConfirmation = document.getElementById('email2').value;
-            const password = document.getElementById('password1').value;
-            const passwordConfirmation = document.getElementById('password2').value;
-
-            let valid = true;
-
-            // Vérifier si les emails correspondent
-            if (email !== emailConfirmation) {
-                alert("Les adresses courriel ne correspondent pas.");
-                valid = false;
-            }
-
-            // Vérifier si les mots de passe correspondent
-            if (password !== passwordConfirmation) {
-                alert("Les mots de passe ne correspondent pas.");
-                valid = false;
-            }
-
-            return valid; // Retourne vrai si tout est valide, sinon faux
-        }
-    </script>
-</head>
-<body>
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
-        /* Styles pour le bouton */
         .submit-button {
-            background-color: #007bff; /* Couleur de fond bleu */
-            color: white; /* Couleur du texte */
-            border: none; /* Pas de bordure */
-            padding: 10px 20px; /* Espacement intérieur */
-            font-size: 16px; /* Taille de la police */
-            cursor: pointer; /* Curseur pointer */
-            border-radius: 5px; /* Coins arrondis */
-            transition: background-color 0.3s; /* Transition douce pour le survol */
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
         }
 
         .submit-button:hover {
-            background-color: #0056b3; /* Couleur au survol */
+            background-color: #0056b3;
         }
     </style>
     <script>
-        function toggleAdminCheckbox() {
-            const emailInput = document.getElementById('email1').value;
-            const adminCheckbox = document.getElementById('adminSection');
-            if (emailInput === 'admin@gmail.com') {
-                adminCheckbox.style.display = 'block'; // Afficher la section admin
-            } else {
-                adminCheckbox.style.display = 'none'; // Masquer la section admin
-                document.getElementById('isAdmin').checked = false; // Désélectionner le checkbox si visible
-            }
-        }
-
         function validateForm() {
-            const email = document.getElementById('email1').value;
-            const emailConfirmation = document.getElementById('email2').value;
-            const password = document.getElementById('password1').value;
-            const passwordConfirmation = document.getElementById('password2').value;
+            const email = document.getElementById('email').value;
+            const emailConfirmation = document.getElementById('confirm_email').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirmation = document.getElementById('confirm_password').value;
 
             let valid = true;
 
-            // Vérifier si les emails correspondent
             if (email !== emailConfirmation) {
                 alert("Les adresses courriel ne correspondent pas.");
                 valid = false;
             }
 
-            // Vérifier si les mots de passe correspondent
             if (password !== passwordConfirmation) {
                 alert("Les mots de passe ne correspondent pas.");
                 valid = false;
             }
 
-            return valid; // Retourne vrai si tout est valide, sinon faux
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{5,15}$/;
+            if (!passwordPattern.test(password)) {
+                alert("Le mot de passe doit comporter entre 5 et 15 caractères, inclure des lettres majuscules, minuscules et des chiffres.");
+                valid = false;
+            }
+
+            return valid;
         }
     </script>
 </head>
 <body>
 
-    <form class="register_form" action="modifier_profil.php" method="POST" onsubmit="return validateForm();">
-        <p class="titre">Inscription</p>
-        
-        <label for="email1">Courriel :</label>
-        <input type="email" name="courriel" id="email1" required oninput="toggleAdminCheckbox();" value="<?php echo isset($courriel) ? htmlspecialchars($courriel) : ''; ?>">
+<form class="modify_profile_form" action="" method="POST" onsubmit="return validateForm()">
+    <p class="titre">Inscription</p>
 
-        <label for="email2">Confirmez le courriel :</label>
-        <input type="email" name="courriel_confirmation" id="email2" required value="<?php echo isset($courriel) ? htmlspecialchars($courriel) : ''; ?>">
+    <!-- Champ Courriel -->
+    <label for="email">Courriel :</label>
+    <input type="email" name="courriel" id="email" required>
 
-        <label for="password1">Mot de passe :</label>
-        <input type="password" name="password1" id="password1" required>
+    <!-- Confirmation du Courriel -->
+    <label for="confirm_email">Confirmez le courriel :</label>
+    <input type="email" name="courriel_confirmation" id="confirm_email" required>
 
-        <label for="password2">Confirmez le mot de passe :</label>
-        <input type="password" name="password2" id="password2" required>
+    <!-- Champ Mot de Passe -->
+    <label for="password">Mot de passe :</label>
+    <input type="password" name="motDePasse" id="password" required>
 
-        <!-- Section pour inscrire en tant qu'administrateur -->
-        <div id="adminSection" style="display: none;">
-            <label>
-                <input type="checkbox" name="isAdmin" value="1" id="isAdmin"> Inscrire en tant qu'administrateur
-            </label>
-        </div>
+    <!-- Confirmation du Mot de Passe -->
+    <label for="confirm_password">Confirmez le mot de passe :</label>
+    <input type="password" name="confirm_password" id="confirm_password" required>
 
-        <input type="submit" value="S'inscrire" class="submit-button">
-    </form>
+    <!-- Bouton de soumission -->
+    <input type="submit" value="S'inscrire" class="submit-button">
+</form>
 </body>
 </html>

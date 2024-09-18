@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $result->fetch_assoc();
 
         // Vérifier le mot de passe
-        if (password_verify($mot_de_passe, $user['MotDePasse'])) {
+        if (!is_null($user['MotDePasse']) && password_verify($mot_de_passe, $user['MotDePasse'])) {
             // Incrémenter le nombre de connexions
             $stmt = $conn->prepare("UPDATE utilisateurs SET NbConnexions = NbConnexions + 1 WHERE NoUtilisateur = ?");
             $stmt->bind_param("i", $user['NoUtilisateur']);
