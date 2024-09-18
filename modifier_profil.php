@@ -40,13 +40,12 @@
             errors.push("L'email ne doit pas dépasser 50 caractères.");
         }
 
-        // Validation du numéro d'employé
-        if (NoEmpl === "") {
-            errors.push("Le numéro d'emploi est obligatoire.");
-        } else if (!/^[0-9]+$/.test(NoEmpl)) {
-            errors.push("Le numéro d'emploi doit être un nombre entier.");
-        }
-
+      // Validation du numéro d'employé
+if (NoEmpl !== "" && NoEmpl !== null) {
+    if (!/^[0-9]+$/.test(NoEmpl)) {
+        errors.push("Le numéro d'employé doit être un nombre entier.");
+    }
+}
        
         // Affichage des erreurs
         if (errors.length > 0) {
@@ -129,7 +128,7 @@
         <div class="form-group row">
             <label for="tbNoEmpl" class="col-4 col-form-label">Numéro Employé</label>
             <div class="col-6">
-                <input type="text" class="form-control" id="tbNoEmpl" name="NoEmpl" placeholder="Entrez votre numéro d'emploi" required pattern="[0-9]+" title="Le numéro d'emploi doit être un nombre entier." value="<?php echo isset($NoEmpl) ? htmlspecialchars($NoEmpl) : ''; ?>">
+                <input type="text" class="form-control" id="tbNoEmpl" name="NoEmpl" placeholder="Entrez votre numéro d'emploi"  pattern="[0-9]+" title="Le numéro d'emploi doit être un nombre entier." value="<?php echo isset($NoEmpl) ? htmlspecialchars($NoEmpl) : ''; ?>">
             </div>
         </div>
 

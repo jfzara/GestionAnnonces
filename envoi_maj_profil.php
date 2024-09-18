@@ -1,17 +1,15 @@
-<?php 
+<?php
 require 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+// Charger les variables d'environnement
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 session_start();
 
-
-
-
-// Configurations de base de données
+// Connexion à la base de données
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -21,28 +19,25 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nom = $_POST['nom'] ?? '';
-    $prenom = $_POST['prenom'] ?? '';
-    $courriel = $_POST['courriel'] ?? '';
-    $noTelMaison = $_POST['NoTelMaison'] ?? '';
-    $noTelTravail = $_POST['NoTelTravail'] ?? '';
-    $noTelCellulaire = $_POST['NoTelCellulaire'] ?? '';
+    // Récupérer les données soumises
+    $nom = htmlspecialchars($_POST['nom'] ?? '');
+    $prenom = htmlspecialchars($_POST['prenom'] ?? '');
+    $courriel = filter_var($_POST['courriel'] ?? '', FILTER_VALIDATE_EMAIL) ? $_POST['courriel'] : '';
+    $noTelMaison = htmlspecialchars($_POST['NoTelMaison'] ?? '');
+    $noTelTravail = htmlspecialchars($_POST['NoTelTravail'] ?? '');
+    $noTelCellulaire = htmlspecialchars($_POST['NoTelCellulaire'] ?? '');
+    $NoEmpl = isset($_POST['NoEmpl']) ? htmlspecialchars($_POST['NoEmpl']) : null;
 
     // Validation des champs
     $champsVides = [];
     if (empty($nom)) $champsVides[] = 'nom';
     if (empty($prenom)) $champsVides[] = 'prenom';
-    if (empty($courriel) || !filter_var($courriel, FILTER_VALIDATE_EMAIL)) $champsVides[] = 'courriel';
-    if (empty($noTelMaison) || !preg_match('/^[\d\s\(\)\-\_]+$/', $noTelMaison)) {
-        $champsVides[] = 'NoTelMaison doit être valide.';
-    }
-    if (empty($noTelCellulaire) || !preg_match('/^[\d\s\(\)\-\_]+$/', $noTelCellulaire)) {
-        $champsVides[] = 'NoTelCellulaire doit être valide.';
-    }
-    if (empty($noTelTravail) || !preg_match('/^[\d\s\(\)\-\_]+$/', $noTelTravail)) {
-        $champsVides[] = 'NoTelTravail doit être valide.';
-    }
+    if (empty($courriel)) $champsVides[] = 'courriel invalide';
+    if (!preg_match('/^[\d\s\(\)\-\_]+$/', $noTelMaison)) $champsVides[] = 'NoTelMaison invalide';
+    if (!preg_match('/^[\d\s\(\)\-\_]+$/', $noTelTravail)) $champsVides[] = 'NoTelTravail invalide';
+    if (!preg_match('/^[\d\s\(\)\-\_]+$/', $noTelCellulaire)) $champsVides[] = 'NoTelCellulaire invalide';
 
+    // Afficher les erreurs de validation si elles existent
     if (!empty($champsVides)) {
         foreach ($champsVides as $champ) {
             echo "<div style='color: red;'>Le champ $champ est requis ou invalide.</div>";
@@ -50,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         // Nettoyage des numéros de téléphone
         $noTelMaison = preg_replace('/[^\d]/', '', $noTelMaison);
-        $noTelCellulaire = preg_replace('/[^\d]/', '', $noTelCellulaire);
         $noTelTravail = preg_replace('/[^\d]/', '', $noTelTravail);
+        $noTelCellulaire = preg_replace('/[^\d]/', '', $noTelCellulaire);
 
         // Vérification de l'existence de l'utilisateur
         $queryCheck = 'SELECT * FROM utilisateurs WHERE Courriel = ?';
@@ -61,34 +56,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $resultCheck = $stmtCheck->get_result();
 
         if ($resultCheck->num_rows > 0) {
-            // Récupérer l'utilisateur pour obtenir le token
+            // Utilisateur trouvé, récupération du token
             $utilisateur = $resultCheck->fetch_assoc();
-            $token = $utilisateur['Token']; // Remplacez 'Token' par le nom de votre colonne de token
+            $token = $utilisateur['Token'];
 
-            // Mettre à jour les informations de l'utilisateur
-            $queryUpdate = 'UPDATE utilisateurs SET Nom = ?, Prenom = ?, NoTelMaison = ?, NoTelTravail = ?, NoTelCellulaire = ? WHERE Courriel = ?';
+            // Requête de mise à jour
+            $queryUpdate = 'UPDATE utilisateurs SET Nom = ?, Prenom = ?, NoTelMaison = ?, NoTelTravail = ?, NoTelCellulaire = ?, NoEmpl = ? WHERE Courriel = ?';
             $stmtUpdate = $conn->prepare($queryUpdate);
-            $stmtUpdate->bind_param("ssssss", $nom, $prenom, $noTelMaison, $noTelTravail, $noTelCellulaire, $courriel);
+            $stmtUpdate->bind_param("sssssss", $nom, $prenom, $noTelMaison, $noTelTravail, $noTelCellulaire, $NoEmpl, $courriel);
             $stmtUpdate->execute();
 
-            // Email existe déjà, donc envoi de l'email avec le lien
+            // Envoi de l'email de confirmation
             $_SESSION['message'] = "Un courriel de confirmation a été envoyé à <strong>$courriel</strong>.";
 
-            // Envoi de l'email de confirmation avec le lien
-            $lienConfirmation = 'http://localhost/GestionAnnonces/confirmation.php?token=' . $token; // Utiliser le token récupéré
+            $lienConfirmation = 'http://localhost/GestionAnnonces/confirmation.php?token=' . htmlentities($token);
             $mail = new PHPMailer(true);
             try {
                 $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com'; // Spécifiez le serveur SMTP
+                $mail->Host = 'smtp.gmail.com';
                 $mail->SMTPAuth = true;
-                $mail->Username = 'zarajeanfabrice@gmail.com'; // Votre adresse e-mail
+                $mail->Username = 'zarajeanfabrice@gmail.com';
                 $mail->Password = 'mcskbtuzgqxatnwn'; // Votre mot de passe d'application
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Activer le chiffrement TLS
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port = 587;
 
                 $mail->setFrom('no-reply@example.com', 'Gestion Annonces');
                 $mail->addAddress($courriel);
                 $mail->Subject = 'Confirmation de mise à jour';
+                $mail->isHTML(true);
                 $mail->Body = "Merci pour votre mise à jour! Pour confirmer votre compte, veuillez cliquer sur le lien suivant : <a href='$lienConfirmation'>Confirmer</a>";
 
                 $mail->send();
@@ -96,10 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 echo "L'email de confirmation n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
             }
         } else {
-            echo 'Aucun utilisateur trouvé avec cet email : ' . $courriel;
+            echo 'Aucun utilisateur trouvé avec cet email : ' . htmlentities($courriel);
         }
 
-        // Fermer la connexion à la base de données
+        // Fermer la connexion
         $stmtCheck->close();
         $conn->close();
     }
@@ -111,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <?php if (isset($_SESSION['message'])): ?>
         <div style="color: green;">
             <?php echo $_SESSION['message']; ?>
-            <?php unset($_SESSION['message']); // Supprimer le message après l'affichage ?>
+            <?php unset($_SESSION['message']); ?>
         </div>
     <?php endif; ?>
 </div>
@@ -123,5 +118,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <input type="text" name="NoTelMaison" placeholder="Téléphone Maison" required>
     <input type="text" name="NoTelTravail" placeholder="Téléphone Travail" required>
     <input type="text" name="NoTelCellulaire" placeholder="Téléphone Cellulaire" required>
+    <input type="text" name="NoEmpl" placeholder="Numéro Employé (optionnel)">
     <button type="submit">Mettre à jour</button>
 </form>
