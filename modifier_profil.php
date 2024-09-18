@@ -47,11 +47,7 @@
             errors.push("Le numéro d'emploi doit être un nombre entier.");
         }
 
-        // Validation du statut
-        if (statut === "") {
-            errors.push("Le statut est obligatoire.");
-        }
-
+       
         // Affichage des erreurs
         if (errors.length > 0) {
             alert(errors.join("\n"));
@@ -116,14 +112,16 @@
         <div class="form-group row">
             <label for="tbStatut" class="col-4 col-form-label">Statut</label>
             <div class="col-6">
-                <select class="form-control" id="tbStatut" name="statut" required>
-                    <option value="">Sélectionnez un statut</option>
-                    <option value="1" <?php echo isset($statut) && $statut == 1 ? 'selected' : ''; ?>>Administrateur</option>
-                    <option value="2" <?php echo isset($statut) && $statut == 2 ? 'selected' : ''; ?>>Cadre</option>
-                    <option value="3" <?php echo isset($statut) && $statut == 3 ? 'selected' : ''; ?>>Employé de soutien</option>
-                    <option value="4" <?php echo isset($statut) && $statut == 4 ? 'selected' : ''; ?>>Enseignant</option>
-                    <option value="5" <?php echo isset($statut) && $statut == 5 ? 'selected' : ''; ?>>Professionnel</option>
-                </select>
+               
+                <label for="statut">Sélectionnez un statut (optionnel) :</label>
+    <select class="form-control" name="statut" id="tbStatut">
+        <option value="">-- Aucun statut spécifique --</option>
+        <option value="1">Administrateur</option>
+        <option value="2">Cadre</option>
+        <option value="3">Employé de soutien</option>
+        <option value="4">Enseignant</option>
+        <option value="5">Professionnel</option>
+    </select>
             </div>
         </div>
 

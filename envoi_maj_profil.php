@@ -6,16 +6,10 @@ use PHPMailer\PHPMailer\Exception;
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-
 session_start();
 
-// Affichage du contenu de la session pour le débogage
-echo "<pre>";
-print_r($_SESSION);
-echo "</pre>";
-
 // Récupérer le mot de passe depuis la session
-$motDePasse = isset($_SESSION['motDePasse']) ? $_SESSION['motDePasse'] : null;
+$motDePasse = $_SESSION['motDePasse'] ?? null;
 
 if ($motDePasse === null) {
     echo "Le mot de passe doit être disponible dans la session.";
@@ -39,12 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $noTelTravail = $_POST['NoTelTravail'] ?? '';
     $noTelCellulaire = $_POST['NoTelCellulaire'] ?? '';
 
+    // Validation des champs
     $champsVides = [];
     if (empty($nom)) $champsVides[] = 'nom';
     if (empty($prenom)) $champsVides[] = 'prenom';
     if (empty($courriel) || !filter_var($courriel, FILTER_VALIDATE_EMAIL)) $champsVides[] = 'courriel';
-    
-    // Validation des numéros de téléphone
     if (empty($noTelMaison) || !preg_match('/^[\d\s\(\)\-\_]+$/', $noTelMaison)) {
         $champsVides[] = 'NoTelMaison doit être valide.';
     }
@@ -60,61 +53,96 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $noTelCellulaire = preg_replace('/[^\d]/', '', $noTelCellulaire);
     $noTelTravail = preg_replace('/[^\d]/', '', $noTelTravail);
 
-    // Vérifier si l'email existe déjà
-    $queryCheck = "SELECT COUNT(*) FROM utilisateurs WHERE Courriel = ?";
+    // Vérification de l'existence de l'utilisateur
+    $queryCheck = 'SELECT * FROM utilisateurs WHERE Courriel = ?';
     $stmtCheck = $conn->prepare($queryCheck);
     $stmtCheck->bind_param("s", $courriel);
     $stmtCheck->execute();
-    $stmtCheck->bind_result($count);
-    $stmtCheck->fetch();
-    $stmtCheck->close();
+    $resultCheck = $stmtCheck->get_result();
 
-    if ($count > 0) {
-        die("L'email existe déjà. Veuillez utiliser un autre email.");
-    }
+    if ($resultCheck->num_rows > 0) {
+        // Récupérer l'utilisateur pour obtenir le token
+        $utilisateur = $resultCheck->fetch_assoc();
+        $token = $utilisateur['Token']; // Remplacez 'Token' par le nom de votre colonne de token
 
-    // Hacher le mot de passe
-    $motDePasseHache = password_hash($motDePasse, PASSWORD_DEFAULT);
-    $token = bin2hex(random_bytes(16));
+        // Email existe déjà, donc mise à jour des informations
+        $_SESSION['message'] = "Un courriel de confirmation a été envoyé à <strong>$courriel</strong>.";
 
-    // Préparez la requête d'INSERT
-    $query = 'INSERT INTO utilisateurs (Nom, Prenom, Courriel, NoTelMaison, NoTelCellulaire, NoTelTravail, Statut, Token, MotDePasse) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    $stmt = $conn->prepare($query);
-    $statut = 1; 
-    $stmt->bind_param("ssssssiss", $nom, $prenom, $courriel, $noTelMaison, $noTelCellulaire, $noTelTravail, $statut, $token, $motDePasseHache);
-
-    if ($stmt->execute()) {
+        // Envoi de l'email de confirmation avec le lien
+        $lienConfirmation = 'http://localhost/GestionAnnonces/confirmation.php?token=' . $token; // Utiliser le token récupéré
         $mail = new PHPMailer(true);
-
         try {
-            // Paramètres SMTP
             $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
+            $mail->Host = 'smtp.gmail.com'; // Spécifiez le serveur SMTP
             $mail->SMTPAuth = true;
-            $mail->Username = 'zarajeanfabrice@gmail.com'; // Adresse email
-            $mail->Password = 'mcskbtuzgqxatnwn'; // Mot de passe d'application
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Username = 'zarajeanfabrice@gmail.com'; // Votre adresse e-mail
+            $mail->Password = 'mcskbtuzgqxatnwn'; // Votre mot de passe d'application
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Activer le chiffrement TLS
             $mail->Port = 587;
 
-            // Débogage SMTP pour voir les étapes
-            $mail->SMTPDebug = 2;
+            $mail->setFrom('no-reply@example.com', 'Gestion Annonces');
+            $mail->addAddress($courriel);
+            $mail->Subject = 'Confirmation de mise à jour';
+            $mail->Body = "Merci pour votre inscription! Pour confirmer votre compte, veuillez cliquer sur le lien suivant : <a href='$lienConfirmation'>Confirmer</a>";
 
-            // Expéditeur et destinataire
-            $mail->setFrom('zarajeanfabrice@gmail.com', 'Votre Nom');
-            $mail->addAddress('destinataire@example.com');
-
-            // Contenu de l'email
-            $mail->isHTML(true);
-            $mail->Subject = 'Test';
-            $mail->Body = 'Ceci est un test.';
-
-            // Envoi de l'email
             $mail->send();
-            echo 'Email envoyé avec succès';
         } catch (Exception $e) {
-            echo "Erreur lors de l'envoi de l'email : {$mail->ErrorInfo}";
+            echo "L'email de confirmation n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+        }
+    } else {
+        // Si l'utilisateur n'existe pas, insérer un nouvel utilisateur avec statut 0 (en attente)
+        $token = bin2hex(random_bytes(16)); // Générer un token unique
+        $queryInsert = 'INSERT INTO utilisateurs (Nom, Prenom, Courriel, NoTelMaison, NoTelTravail, NoTelCellulaire, Token, Statut) VALUES (?, ?, ?, ?, ?, ?, ?, 0)';
+        $stmtInsert = $conn->prepare($queryInsert);
+        $stmtInsert->bind_param("ssssssss", $nom, $prenom, $courriel, $noTelMaison, $noTelTravail, $noTelCellulaire, $token);
+        $stmtInsert->execute();
+
+        $_SESSION['message'] = "Votre inscription est en cours. Un courriel de confirmation a été envoyé à <strong>$courriel</strong>.";
+
+        // Envoi de l'email de confirmation
+        $lienConfirmation = 'http://localhost/GestionAnnonces/confirmation.php?token=' . $token;
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com'; // Spécifiez le serveur SMTP
+            $mail->SMTPAuth = true;
+            $mail->Username = 'zarajeanfabrice@gmail.com'; // Votre adresse e-mail
+            $mail->Password = 'mcskbtuzgqxatnwn'; // Votre mot de passe d'application
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Activer le chiffrement TLS
+            $mail->Port = 587;
+
+            $mail->setFrom('no-reply@example.com', 'Gestion Annonces');
+            $mail->addAddress($courriel);
+            $mail->Subject = 'Confirmation de votre inscription';
+            $mail->Body = "Merci pour votre inscription! Pour confirmer votre compte, veuillez cliquer sur le lien suivant : <a href='$lienConfirmation'>Confirmer</a>";
+
+            $mail->send();
+        } catch (Exception $e) {
+            echo "L'email de confirmation n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
         }
     }
-    // Fermer la connexion à la base de données après l'envoi de l'email
+
+    // Fermer la connexion à la base de données
     $conn->close();
-} // Fermeture de la condition POST
+}
+?>
+
+<!-- Affichage du message de confirmation et du formulaire -->
+<div style="margin-bottom: 20px;">
+    <?php if (isset($_SESSION['message'])): ?>
+        <div style="color: green;">
+            <?php echo $_SESSION['message']; ?>
+            <?php unset($_SESSION['message']); // Supprimer le message après l'affichage ?>
+        </div>
+    <?php endif; ?>
+</div>
+
+<form action="" method="post">
+    <input type="text" name="nom" placeholder="Nom" required>
+    <input type="text" name="prenom" placeholder="Prénom" required>
+    <input type="email" name="courriel" placeholder="Courriel" required>
+    <input type="text" name="NoTelMaison" placeholder="Téléphone Maison" required>
+    <input type="text" name="NoTelTravail" placeholder="Téléphone Travail" required>
+    <input type="text" name="NoTelCellulaire" placeholder="Téléphone Cellulaire" required>
+    <button type="submit">Mettre à jour</button>
+</form>
