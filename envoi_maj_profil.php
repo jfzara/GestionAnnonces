@@ -26,7 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $noTelMaison = htmlspecialchars($_POST['NoTelMaison'] ?? '');
     $noTelTravail = htmlspecialchars($_POST['NoTelTravail'] ?? '');
     $noTelCellulaire = htmlspecialchars($_POST['NoTelCellulaire'] ?? '');
-    
+    $statut = isset($_POST['statut']) && !empty($_POST['statut']) ? htmlspecialchars($_POST['statut']) : NULL;
+
     // Si NoEmpl est vide, le remplacer par NULL
     $NoEmpl = isset($_POST['NoEmpl']) && !empty($_POST['NoEmpl']) ? htmlspecialchars($_POST['NoEmpl']) : NULL;
 
@@ -62,11 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $utilisateur = $resultCheck->fetch_assoc();
             $token = $utilisateur['Token'];
 
-            // Requête de mise à jour
-            $queryUpdate = 'UPDATE utilisateurs SET Nom = ?, Prenom = ?, NoTelMaison = ?, NoTelTravail = ?, NoTelCellulaire = ?, NoEmpl = ? WHERE Courriel = ?';
-            $stmtUpdate = $conn->prepare($queryUpdate);
-            $stmtUpdate->bind_param("sssssss", $nom, $prenom, $noTelMaison, $noTelTravail, $noTelCellulaire, $NoEmpl, $courriel);
-            $stmtUpdate->execute();
+           // Requête de mise à jour
+$queryUpdate = 'UPDATE utilisateurs SET Nom = ?, Prenom = ?, NoTelMaison = ?, NoTelTravail = ?, NoTelCellulaire = ?, NoEmpl = ? WHERE Courriel = ?';
+$stmtUpdate = $conn->prepare($queryUpdate);
+$stmtUpdate->bind_param("sssssss", $nom, $prenom, $noTelMaison, $noTelTravail, $noTelCellulaire, $NoEmpl, $courriel);
+$stmtUpdate->execute();
 
             // Envoi de l'email de confirmation
             $_SESSION['message'] = "Un courriel de confirmation a été envoyé à <strong>$courriel</strong>.";
