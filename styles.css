@@ -82,6 +82,7 @@ input:focus {
 button, .soumettre {
     padding: 10px;
     background-color: #007bff;
+    font-weight: bold;
     color: white;
     border: none;
     border-radius: 5px;

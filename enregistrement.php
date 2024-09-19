@@ -155,6 +155,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <input type="password" name="confirm_password" id="confirm_password" required>
 
     <input type="submit" value="S'inscrire" class="submit-button">
+    <br>
+    <p><a class="lien_enregistrement" href="login.php">Se connecter</a></p>
 </form>
 </body>
 </html>
