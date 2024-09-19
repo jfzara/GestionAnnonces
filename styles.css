@@ -210,57 +210,75 @@ nav a:hover {
 
 /* Style global pour les annonces */
 #divListe {
-    display: flex;             /* Utiliser Flexbox */
-    flex-wrap: wrap;          /* Permettre aux cartes de revenir à la ligne */
-    justify-content: space-between; /* Aligner les éléments à droite */
-    width: 80%;    
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    width: 90%;
+    padding-bottom: 8vh;
+    gap: 8%;
+
+
+}
+
+.annonces-container {
+    display: flex; /* Utilisation de Flexbox */
+    justify-content: flex-start; /* Aligner à gauche */
+    flex-wrap: wrap; /* Permet aux cartes de passer à la ligne si nécessaire */
+    max-width: 100%; /* Largeur maximale du conteneur */
+    padding: 10px; /* Espace autour du conteneur, optionnel */
 }
 
 .annonce {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: stretch; /* Étendre les éléments */
-    border: 1px solid rgba(0, 0, 0, .125);
-    border-radius: .25rem;
-    background-color: #fff;
-    width: 13vw;  
-    height: 400px;          /* Hauteur de l'annonce */
-    margin: 20px;          /* Marges autour de chaque annonce */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre autour de l'annonce */
-    padding: 0;            /* Supprimer le padding */
+    width: 200px; /* Largeur fixe pour chaque carte */
+    margin: 5px; /* Espacement entre les cartes */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optionnel : Ajout d'une ombre aux cartes */
+    border-radius: 8px; /* Optionnel : Bords arrondis */
+    background-color: white; /* Optionnel : Couleur de fond */
+    overflow: hidden; /* Pour gérer les ellipses */
+    width: 11vw;
 }
 
-/* En-tête de l'annonce et pied de l'annonce */
-.annonce-header,
-.annonce-footer {
-    background-color: #f0f0f0; /* Couleur de fond gris très clair */
-    border-radius: 5px;      /* Coins arrondis */
-    width: 100%;              /* Largeur complète */
+.annonce-body{
+    padding-inline: 11%;
+    padding-bottom: 16%;
+    text-overflow: ellipsis;
+    color: gray;
 }
 
-/* Image de l'annonce */
-.annonce-image, img {
-    overflow: hidden;  
-    width: 100%;             /* L'image prendra toute la largeur */
-    height: 200px;           /* L'image prendra toute la hauteur */
-    object-fit: cover;       /* Couvre tout l'espace, en rognant l'image si nécessaire */
+.font-weight-bold{
+    font-weight: bolder;
+    color: black;
+text-align: end;
 }
 
-/* Corps de l'annonce */
-.annonce-body {
-    text-align: left;        /* Alignement à gauche du texte */
-    padding-left: 1vw;
-    padding-right: 1vw;   
+.annonce-image img {
+    width: 100%; /* S'étend à la largeur du conteneur */
+    height: 200px; /* Hauteur fixe */
+    object-fit: cover; /* Remplit le conteneur sans déformer l'image */
 }
 
-/* Titre de l'annonce */
-.annonce-title {
-    font-size: 1.5rem;       /* Taille de la police */
-    font-weight: bold;       /* Mettre le texte en gras */
+.annonce-category{
+    text-align: end;
 }
 
-/* Boutons d'action pour chaque annonce */
-.annonce-action {
-    margin-top: auto; /* Espacement en haut */
+.ellipsis {
+    overflow: hidden;
+    white-space: nowrap; /* Texte sur une seule ligne */
+    text-overflow: ellipsis; /* Affiche les points de suspension */
+}
+
+.footer-date {
+    padding-left: 10px; /* Padding à gauche pour le footer */
+}
+
+.footer-number {
+    padding-right: 10px;
+    text-align: end;
+}
+.annonce-footer, .annonce-header{
+    background-color: #f7f7f7;
+    border-top: 1px #d5d5d5 solid;
+padding-left: 5px;
+padding-right: 5px;
+    border-bottom: 1px #d5d5d5 solid;
 }

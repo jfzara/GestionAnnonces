@@ -240,17 +240,17 @@ if ( $result->num_rows > 0 ) {
             ?>
             <div id="divAnnonce-<?php echo $row['NoAnnonce']; ?>" class="annonce">
                 <div class="annonce-header">
-                    <div class="text-left"><?php echo $sequentialNumber++; ?></div>
-                    <div class="text-right"><?php echo getCategoryName($row['Categorie']); ?></div>
+                    <div class="text-left annonce-number"><?php echo $sequentialNumber++; ?></div>
+                    <div class="text-right annonce-category"><?php echo getCategoryName($row['Categorie']); ?></div>
                 </div>
-                <div class="annonce-image" >
-                    <img alt="Image de <?php echo $row['DescriptionAbregee']; ?>" src="<?php echo $photoUrl; ?>" >
+                <div class="annonce-image">
+                    <img alt="Image de <?php echo $row['DescriptionAbregee']; ?>" src="<?php echo $photoUrl; ?>">
                 </div>
                 <div class="annonce-body">
                     <h6 class="annonce-title">
-                        <a href="Annonce.php?id=<?php echo $row['NoAnnonce']; ?>"><?php echo $row['DescriptionAbregee']; ?></a>
+                        <a href="Annonce.php?id=<?php echo $row['NoAnnonce']; ?>" class="ellipsis"><?php echo $row['DescriptionAbregee']; ?></a>
                     </h6>
-                    <p class="non-gras"><?php echo $row['DescriptionComplete']; ?></p>
+                    <p class="non-gras ellipsis"><?php echo $row['DescriptionComplete']; ?></p>
                     <div class="text-right font-weight-bold">
                         <span>
                             <?php echo !empty($row['Prix']) ? number_format($row['Prix'], 2, '.', ' ') . " $" : 'N/A'; ?>
@@ -258,8 +258,8 @@ if ( $result->num_rows > 0 ) {
                     </div>
                 </div>
                 <div class="annonce-footer">
-                    <div class="text-left"><?php echo $datePublication; ?></div>
-                    <div class="text-right"><?php echo $row['NoAnnonce']; ?></div>
+                    <div class="text-left footer-date" style="padding-left: 10px;"><?php echo $datePublication; ?></div>
+                    <div class="text-right footer-number" style="padding-right: 10px;"><?php echo $row['NoAnnonce']; ?></div>
                 </div>
             </div>
             <?php
