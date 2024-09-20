@@ -242,6 +242,7 @@ nav a:hover {
 .annonce-body{
     padding-inline: 11%;
     padding-bottom: 16%;
+    margin-bottom: 47px;
     text-overflow: ellipsis;
     color: gray;
 }
@@ -266,6 +267,8 @@ text-align: end;
     overflow: hidden;
     white-space: nowrap; /* Texte sur une seule ligne */
     text-overflow: ellipsis; /* Affiche les points de suspension */
+    font-size: 1rem;
+
 }
 
 .footer-date {

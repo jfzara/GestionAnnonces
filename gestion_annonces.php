@@ -8,8 +8,9 @@ if (!isset($_SESSION['NoUtilisateur'])) {
     exit;
 }
 
-// Récupérer l'ID de l'utilisateur connecté
+// Récupérer l'ID de l'utilisateur connecté et son rôle
 $userId = $_SESSION['NoUtilisateur'];
+$isAdmin = $_SESSION['isAdmin'] ?? false; // Supposons qu'on ait 'isAdmin' dans la session (1 pour admin, 0 pour non-admin)
 
 // Connexion à la base de données
 $conn = new mysqli('localhost', 'root', '', 'gestionannonces');
@@ -19,9 +20,15 @@ if ($conn->connect_error) {
     die("Échec de la connexion : " . $conn->connect_error);
 }
 
-// Préparer la requête pour obtenir les annonces de l'utilisateur connecté
-$stmt = $conn->prepare("SELECT * FROM annonces WHERE NoUtilisateur = ?");
-$stmt->bind_param("i", $userId);
+// Préparer la requête pour obtenir les annonces
+if ($isAdmin) {
+    // Si l'utilisateur est admin, récupérer toutes les annonces
+    $stmt = $conn->prepare("SELECT * FROM annonces");
+} else {
+    // Sinon, récupérer uniquement les annonces de l'utilisateur connecté
+    $stmt = $conn->prepare("SELECT * FROM annonces WHERE NoUtilisateur = ?");
+    $stmt->bind_param("i", $userId);
+}
 
 // Exécuter la requête
 $stmt->execute();
@@ -86,7 +93,7 @@ $result = $stmt->get_result();
             echo "</tr>";
         }
     } else {
-        echo "<tr><td colspan='10' class='text-center'>Vous n'avez aucune annonce enregistrée.</td></tr>";
+        echo "<tr><td colspan='10' class='text-center'>Aucune annonce trouvée.</td></tr>";
     }
     // Fermer la connexion
     $stmt->close();
