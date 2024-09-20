@@ -107,22 +107,26 @@ if (NoEmpl !== "" && NoEmpl !== null) {
             </div>
         </div>
 
-        <!-- Champ Statut -->
-        <div class="form-group row">
-            <label for="tbStatut" class="col-4 col-form-label">Statut</label>
-            <div class="col-6">
-               
-                <label for="statut">Sélectionnez un statut (optionnel) :</label>
-    <select class="form-control" name="statut" id="tbStatut">
-        <option value="">-- Aucun statut spécifique --</option>
-        <option value="1">Administrateur</option>
-        <option value="2">Cadre</option>
-        <option value="3">Employé de soutien</option>
-        <option value="4">Enseignant</option>
-        <option value="5">Professionnel</option>
-    </select>
-            </div>
+      <!-- Champ Statut -->
+<div class="form-group row">
+    <label for="tbStatut" class="col-4 col-form-label">Statut</label>
+    <div class="col-6">
+        <label for="statut">Sélectionnez un statut (optionnel) :</label>
+        <select class="form-control" name="statut" id="tbStatut">
+            <option value="">-- Aucun statut spécifique --</option>
+            <option value="2">Cadre</option>
+            <option value="3">Employé de soutien</option>
+            <option value="4">Enseignant</option>
+            <option value="5">Professionnel</option>
+        </select>
+        <div>
+            <label for="adminCheckbox">
+                <input type="checkbox" name="adminCheckbox" id="adminCheckbox" value="1"> 
+                S'enregistrer en tant qu'administrateur
+            </label>
         </div>
+    </div>
+</div>
 
         <!-- Champ Numéro Employé -->
         <div class="form-group row">
@@ -180,5 +184,20 @@ if (NoEmpl !== "" && NoEmpl !== null) {
         </div>
     </form>
 </div>
+<script>
+        function checkAdminEmail() {
+            const email = document.getElementById('courriel').value;
+            const adminCheckbox = document.getElementById('adminCheckbox');
+
+            // Vérifier si l'email correspond à admin@gmail.com
+            if (email === "admin@gmail.com") {
+                adminCheckbox.disabled = false; // Activer la case à cocher
+            } else {
+                adminCheckbox.disabled = true; // Désactiver la case à cocher
+                adminCheckbox.checked = false; // Décocher si l'email n'est pas admin
+            }
+        }
+    </script>
+
 </body>
 </html>

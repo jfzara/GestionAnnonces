@@ -77,6 +77,21 @@ if (isset($_SESSION['error'])) {
     <link rel="stylesheet" href="styles.css">
     
     <script>
+
+
+        function checkAdminEmail() {
+            const email = document.getElementById('courriel').value;
+            const adminSpan = document.getElementById('adminIndicator');
+
+            // Vérifier si l'email correspond à admin@gmail.com
+            if (email === "admin@gmail.com") {
+                adminSpan.style = "display: inline-block; padding: 2px; margin: 0; width: fit-content; color: green; background-color: white; border-radius: 4px;";// Faire apparaître l'indicateur
+            } else {
+                adminSpan.style.display = "none"; // Cacher si ce n'est pas l'email admin
+            }
+        }
+  
+
         function validateForm() {
             const email = document.getElementById('courriel').value;
             const password = document.getElementById('mot_de_passe').value;
@@ -105,26 +120,16 @@ if (isset($_SESSION['error'])) {
             return true; // Si tout est valide, soumettre le formulaire
         }
 
-        function checkAdminEmail() {
-            const email = document.getElementById('courriel').value;
-            const adminSpan = document.getElementById('adminIndicator');
-
-            // Vérifier si l'email correspond à admin@gmail.com
-            if (email === "admin@gmail.com") {
-                adminSpan.style.display = "inline"; // Afficher le span
-            } else {
-                adminSpan.style.display = "none"; // Cacher le span
-            }
-        }
+        
     </script>
 </head>
 <body>
  
     <form class="loginform" action="login.php" method="POST" onsubmit="return validateForm();">
         <p class="titre connexion">Connexion</p>
-        <label for="courriel">Courriel :</label>
+        <label for="courriel">Courriel :</label> 
         <input type="email" name="courriel" id="courriel" required oninput="checkAdminEmail();">
-        <span id="adminIndicator" style="color: green; font-weight: bold; display: none; margin-left: 10px; background: white; border-radius: 5px;">ADMIN</span>
+        <span id="adminIndicator">  ADMIN </span>
         <br>
         <label for="mot_de_passe">Mot de passe :</label>
         <input type="password" name="mot_de_passe" id="mot_de_passe" required>

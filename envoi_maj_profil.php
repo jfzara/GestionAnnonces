@@ -31,6 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Si NoEmpl est vide, le remplacer par NULL
     $NoEmpl = isset($_POST['NoEmpl']) && !empty($_POST['NoEmpl']) ? htmlspecialchars($_POST['NoEmpl']) : NULL;
 
+    // Validation stricte pour l'administrateur
+    if ($statut === 'admin') {
+        if ($courriel !== "admin@gmail.com" ) {
+            echo "<div style='color: red;'>Entrer le courriel et mot de passe administrateur</div>";
+            return; // Empêcher l'exécution du reste du code si la validation échoue
+        }
+    }
+
+
     // Validation des champs
     $champsVides = [];
     if (empty($nom)) $champsVides[] = 'nom';
