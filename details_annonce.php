@@ -33,6 +33,29 @@ if (isset($_GET['id'])) {
             <meta charset="UTF-8">
             <title>Détails de l'annonce</title>
             <link rel="stylesheet" href="styles.css">
+            <style>
+                .annonce-detail {
+                    position: relative;
+                    padding: 20px;
+                    border: 1px solid #ccc;
+                    margin: 20px;
+                    background-color: #f9f9f9;
+                }
+                .close-btn {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    cursor: pointer;
+                    font-size: 24px;
+                    color: #ff0000;
+                }
+            </style>
+            <script>
+                function closeAnnonce() {
+                    var annonceDetail = document.getElementById('annonce-detail');
+                    annonceDetail.style.display = 'none'; // Masquer la section de l'annonce
+                }
+            </script>
         </head>
         <body>
             <nav class='navbar'>
@@ -41,7 +64,8 @@ if (isset($_GET['id'])) {
                 <a href='modifier_profil.php' class='nav-item'>Modification du profil</a>
                 <a href='logout.php' class='nav-item'>Déconnexion</a>
             </nav>
-            <div class="annonce-detail">
+            <div class="annonce-detail" id="annonce-detail">
+                <span class="close-btn" onclick="closeAnnonce()">✖</span>
                 <h2><?php echo $annonce['DescriptionAbregee']; ?></h2>
                 <img src="<?php echo !empty($annonce['Photo']) ? $annonce['Photo'] : 'default.jpg'; ?>" alt="Image de l'annonce">
                 <p><strong>Description Complète:</strong> <?php echo $annonce['DescriptionComplete']; ?></p>
