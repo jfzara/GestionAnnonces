@@ -247,9 +247,9 @@ if ( $result->num_rows > 0 ) {
                     <img alt="Image de <?php echo $row['DescriptionAbregee']; ?>" src="<?php echo $photoUrl; ?>">
                 </div>
                 <div class="annonce-body">
-                    <h6 class="annonce-title">
-                        <a href="Annonce.php?id=<?php echo $row['NoAnnonce']; ?>" class="ellipsis"><?php echo $row['DescriptionAbregee']; ?></a>
-                    </h6>
+                <h6 class="annonce-title">
+    <a href="details_annonce.php?id=<?php echo $row['NoAnnonce']; ?>" class="ellipsis"><?php echo $row['DescriptionAbregee']; ?></a>
+</h6>
                     <p class="non-gras ellipsis"><?php echo $row['DescriptionComplete']; ?></p>
                     <div class="text-right font-weight-bold">
                         <span>

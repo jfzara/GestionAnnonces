@@ -11,6 +11,9 @@ if (!isset($_SESSION['NoUtilisateur'])) {
 // Récupérer l'ID de l'utilisateur connecté
 $noUtilisateur = $_SESSION['NoUtilisateur'];
 
+// Variable pour stocker les messages
+$message = "";
+
 // Vérifier si le formulaire a été soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Récupérer les données du formulaire
@@ -29,27 +32,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Vérifier si le fichier est une image
     $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
     if ($check === false) {
-        echo "Ce fichier n'est pas une image.";
+        $message = "<div class='alert alert-danger'>Ce fichier n'est pas une image.</div>";
         $uploadOk = 0;
     }
 
     // Vérifier la taille du fichier
     if ($_FILES["fileToUpload"]["size"] > 100000) {
-        echo "Désolé, votre fichier est trop volumineux.";
+        $message = "<div class='alert alert-danger'>Désolé, votre fichier est trop volumineux.</div>";
         $uploadOk = 0;
     }
 
     // Autoriser certains formats de fichiers
     if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-        echo "Désolé, seuls les fichiers JPG, JPEG, PNG et GIF sont autorisés.";
+        $message = "<div class='alert alert-danger'>Désolé, seuls les fichiers JPG, JPEG, PNG et GIF sont autorisés.</div>";
         $uploadOk = 0;
     }
 
     // Télécharger l'image si tout est correct
     if ($uploadOk == 1 && move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetFile)) {
-        echo "Le fichier " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " a été téléchargé. ";
+        $message = "<div class='alert alert-success'>Le fichier " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " a été téléchargé.</div>";
     } else {
-        echo "Désolé, une erreur est survenue lors du téléchargement de votre fichier.";
+        $message = "<div class='alert alert-danger'>Désolé, une erreur est survenue lors du téléchargement de votre fichier.</div>";
         $targetFile = ""; // Mettre à jour si le fichier n'a pas été téléchargé
     }
 
@@ -61,9 +64,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bind_param("iissdsi", $noUtilisateur, $categorie, $petiteDesc, $grosseDesc, $prix, $targetFile, $active);
             $stmt->execute();
 
-            echo "Annonce ajoutée avec succès !";
+            $message = "<div class='alert alert-success'>Annonce ajoutée avec succès !</div>";
         } catch (mysqli_sql_exception $e) {
-            echo "Erreur lors de l'insertion : " . $e->getMessage();
+            $message = "<div class='alert alert-danger'>Erreur lors de l'insertion : " . $e->getMessage() . "</div>";
         }
     }
 }
@@ -80,6 +83,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 <div class="container col-md-5 jumbotron">
     <h2 class="text-center">Ajouter une annonce</h2>
+    
+    <!-- Afficher le message ici -->
+    <?php if (!empty($message)) echo $message; ?>
+
     <form enctype="multipart/form-data" method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
         <input type="hidden" name="MAX_FILE_SIZE" value="100000">
 
