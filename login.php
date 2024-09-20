@@ -85,10 +85,8 @@ if (isset($_SESSION['error'])) {
 
             // Vérifier si l'email correspond à admin@gmail.com
             if (email === "admin@gmail.com") {
-                adminSpan.style = "display: inline-block; padding: 2px; margin: 0; width: fit-content; color: green; background-color: white; border-radius: 4px;";// Faire apparaître l'indicateur
-            } else {
-                adminSpan.style.display = "none"; // Cacher si ce n'est pas l'email admin
-            }
+                adminIndicator.style = "display: inline-block; font-weight: bold; padding: 2px; margin: 0; width: fit-content; color: green; background-color: white; border-radius: 4px;";// Faire apparaître l'indicateur
+            }  
         }
   
 
@@ -129,7 +127,7 @@ if (isset($_SESSION['error'])) {
         <p class="titre connexion">Connexion</p>
         <label for="courriel">Courriel :</label> 
         <input type="email" name="courriel" id="courriel" required oninput="checkAdminEmail();">
-        <span id="adminIndicator">  ADMIN </span>
+        <span id="adminIndicator" style= "display: none;">  ADMIN </span>
         <br>
         <label for="mot_de_passe">Mot de passe :</label>
         <input type="password" name="mot_de_passe" id="mot_de_passe" required>

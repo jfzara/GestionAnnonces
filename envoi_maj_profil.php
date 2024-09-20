@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $noTelTravail = htmlspecialchars($_POST['NoTelTravail'] ?? '');
     $noTelCellulaire = htmlspecialchars($_POST['NoTelCellulaire'] ?? '');
     $statut = isset($_POST['statut']) && !empty($_POST['statut']) ? htmlspecialchars($_POST['statut']) : NULL;
-
+  
     // Si NoEmpl est vide, le remplacer par NULL
     $NoEmpl = isset($_POST['NoEmpl']) && !empty($_POST['NoEmpl']) ? htmlspecialchars($_POST['NoEmpl']) : NULL;
 
@@ -73,12 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $token = $utilisateur['Token'];
 
            // Requête de mise à jour
-$queryUpdate = 'UPDATE utilisateurs SET Nom = ?, Prenom = ?, NoTelMaison = ?, NoTelTravail = ?, NoTelCellulaire = ?, NoEmpl = ? WHERE Courriel = ?';
+$queryUpdate = 'UPDATE utilisateurs SET Nom = ?, Prenom = ?, NoTelMaison = ?, NoTelTravail = ?, NoTelCellulaire = ?, NoEmpl = ?, statut = ? WHERE Courriel = ?';
 $stmtUpdate = $conn->prepare($queryUpdate);
-$stmtUpdate->bind_param("sssssss", $nom, $prenom, $noTelMaison, $noTelTravail, $noTelCellulaire, $NoEmpl, $courriel);
+$stmtUpdate->bind_param("ssssssss", $nom, $prenom, $noTelMaison, $noTelTravail, $noTelCellulaire, $NoEmpl, $statut, $courriel);
 $stmtUpdate->execute();
 
-            // Envoi de l'email de confirmation
+           // Si ce n'est pas un administrateur, envoyer un email de confirmation
+           if ($courriel !== "admin@gmail.com") {
             $_SESSION['message'] = "Un courriel de confirmation a été envoyé à <strong>$courriel</strong>.";
 
             $lienConfirmation = 'http://localhost/GestionAnnonces/confirmation.php?token=' . htmlentities($token);
@@ -103,13 +104,16 @@ $stmtUpdate->execute();
                 echo "L'email de confirmation n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
             }
         } else {
-            echo 'Aucun utilisateur trouvé avec cet email : ' . htmlentities($courriel);
+            // Si c'est un admin, afficher un message sans envoyer de mail
+            $_SESSION['message'] = "Les informations de l'administrateur ont été mises à jour avec succès.";
         }
-
-        // Fermer la connexion
-        $stmtCheck->close();
-        $conn->close();
+    } else {
+        echo 'Aucun utilisateur trouvé avec cet email : ' . htmlentities($courriel);
     }
+
+    $stmtCheck->close();
+    $conn->close();
+}
 }
 ?>
 

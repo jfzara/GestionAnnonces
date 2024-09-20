@@ -77,6 +77,20 @@ if (NoEmpl !== "" && NoEmpl !== null) {
             return phone; // Retourne le numéro tel quel s'il n'a pas 10 chiffres
         }
     }
+
+    function checkAdminEmail() {
+            const email = document.getElementById('courriel').value;
+            const adminCheckbox = document.getElementById('adminCheckbox');
+
+            // Vérifier si l'email correspond à admin@gmail.com
+    if (email !=== "admin@gmail.com") {
+        adminCheckbox.checked = false; // Cocher la case
+        adminCheckbox.disabled = true; // Activer la case à cocher
+    } else {
+        adminCheckbox.checked = true; // Décocher si l'email n'est pas admin
+        adminCheckbox.disabled = false; // Désactiver la case à cocher
+    }
+        }
     </script>
 </head>
 <body>
@@ -121,7 +135,7 @@ if (NoEmpl !== "" && NoEmpl !== null) {
         </select>
         <div>
             <label for="adminCheckbox">
-                <input type="checkbox" name="adminCheckbox" id="adminCheckbox" value="1"> 
+                <input type="checkbox" name="adminCheckbox" id="adminCheckbox" value="1" style = "color: blue;"> 
                 S'enregistrer en tant qu'administrateur
             </label>
         </div>
@@ -185,18 +199,7 @@ if (NoEmpl !== "" && NoEmpl !== null) {
     </form>
 </div>
 <script>
-        function checkAdminEmail() {
-            const email = document.getElementById('courriel').value;
-            const adminCheckbox = document.getElementById('adminCheckbox');
-
-            // Vérifier si l'email correspond à admin@gmail.com
-            if (email === "admin@gmail.com") {
-                adminCheckbox.disabled = false; // Activer la case à cocher
-            } else {
-                adminCheckbox.disabled = true; // Désactiver la case à cocher
-                adminCheckbox.checked = false; // Décocher si l'email n'est pas admin
-            }
-        }
+        
     </script>
 
 </body>
