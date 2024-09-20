@@ -41,6 +41,51 @@ $result = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des annonces</title>
     <link rel="stylesheet" href="styles.css">  
+    <style>
+        /* Espacement des colonnes et styles généraux du tableau */
+        table {
+            width: 100%; /* Le tableau prend toute la largeur de l'écran */
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px; /* Padding de 10px pour les cellules */
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        td {
+            white-space: nowrap; /* Pour éviter que les cellules soient compressées */
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        #boutonDesactiver {
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+#boutonDesactiver:hover {
+    background-color: #707070; /* Couleur de survol */
+}
+
+#boutonDesactiver.active {
+    background-color: blue; /* Couleur lorsque le bouton est activé */
+}
+
+#boutonDesactiver.disabled {
+    background-color: grey; /* Couleur par défaut */
+}
+       
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -51,7 +96,7 @@ $result = $stmt->get_result();
     </nav>
 
     <div class="text-right">
-        <a href="ajouter_annonce.php" class="btn btn-success">Ajouter une annonce</a>
+        <a href="ajouter_annonce.php" class="btn btn-success"  >Ajouter une annonce</a>
     </div>
 
     <h2>Gestion des annonces</h2>
@@ -86,12 +131,20 @@ $result = $stmt->get_result();
             echo "<td>{$row['Prix']} $</td>";
             echo "<td>{$row['Parution']}</td>";
             echo "<td>{$row['Etat']}</td>";
-            // Chaque bouton dans sa propre cellule 
-            echo "<td><button style='background-color: #4caf50; color: white; border: none; padding: 10px; cursor: pointer;' onclick='modifyAnnouncement({$row['NoAnnonce']})'>Modifier</button></td>";
+           // Chaque bouton dans sa propre cellule 
+echo "<td><button style='background-color: #4caf50; color: white; border: none; padding: 10px; cursor: pointer; transition: background-color 0.3s;' 
+onmouseover=\"this.style.backgroundColor='#45a049'\" 
+onmouseout=\"this.style.backgroundColor='#4caf50'\" 
+onclick='modifyAnnouncement({$row['NoAnnonce']})'>Modifier</button></td>";
 
-echo "<td><button style='background-color: #f44336; color: white; border: none; padding: 10px; cursor: pointer;' onclick='confirmWithdrawal({$row['NoAnnonce']})'>Retirer</button></td>";
+echo "<td><button style='background-color: #f44336; color: white; border: none; padding: 10px; cursor: pointer; transition: background-color 0.3s;' 
+onmouseover=\"this.style.backgroundColor='#e53935'\" 
+onmouseout=\"this.style.backgroundColor='#f44336'\" 
+onclick='confirmWithdrawal({$row['NoAnnonce']})'>Retirer</button></td>";
 
-echo "<td><button style='background-color: grey; color: white; border: none; padding: 10px; cursor: pointer;' data-state='desactiver' onclick='toggleStatus(this)'>Désactiver</button></td>";
+echo "<td>
+        <button id='boutonDesactiver' class='disabled' data-state='desactiver' onclick='toggleStatus(this)'>Désactiver</button>
+      </td>";
 
 echo "</tr>";
         }
@@ -108,19 +161,21 @@ echo "</tr>";
 
     <script>
     function toggleStatus(button) {
-        const currentState = button.getAttribute('data-state');
-
-        // Logique de changement de texte et d'état
-        if (currentState === 'desactiver') {
-            button.innerText = 'Activer';
-            button.setAttribute('data-state', 'activer');
-            button.classList.remove('désactiver'); // Retire la classe grise
-        } else {
-            button.innerText = 'Désactiver';
-            button.setAttribute('data-state', 'desactiver');
-            button.classList.add('désactiver'); // Ajoute la classe grise
-        }
+    const currentState = button.getAttribute('data-state');
+   
+    // Logique de changement de texte et d'état
+    if (currentState === 'desactiver') {
+        button.innerText = 'Activer';
+        button.setAttribute('data-state', 'activer');
+        button.style.backgroundColor = '#007bff'; // Changer la couleur en bleu
+        button.classList.remove('désactiver'); // Retire la classe grise
+    } else {
+        button.innerText = 'Désactiver';
+        button.setAttribute('data-state', 'desactiver');
+        button.style.backgroundColor = 'grey'; // Rétablir la couleur grise
+        button.classList.add('désactiver'); // Ajoute la classe grise
     }
+}
 
     function modifyAnnouncement(id) {
         window.location.href = `modifier_annonce.php?id=${id}`;
