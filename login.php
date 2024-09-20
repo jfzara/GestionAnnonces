@@ -132,6 +132,8 @@ if (isset($_SESSION['error'])) {
         <label for="mot_de_passe">Mot de passe :</label>
         <input type="password" name="mot_de_passe" id="mot_de_passe" required>
         <br>
+        <p><a href="mot_de_passe_oublie.php">Mot de passe oublié ?</a></p>
+        <br>
         <input class="soumettre" type="submit" value="Se connecter">
 
         <div id="errorMessages" style="color:red;">
