@@ -78,68 +78,7 @@ input:focus {
     outline: none;         /* Supprimer le contour par défaut */
 }
 
-/* Bouton */
-button, .soumettre {
-    padding: 10px;
-    background-color: #007bff;
-    font-weight: bold;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%; /* Bouton prend toute la largeur */
-    transition: background-color 0.3s; /* Transition pour le changement de couleur */
-}
 
-button:hover {
-    background-color: #0056b3;
-}
-
-/* Styles généraux pour les boutons personnalisés */
-button.modifier-btn,
-button.retirer-btn,
-button.desactiver-btn {
-    padding: 10px;               /* Espacement interne */
-    color: white;                /* Couleur du texte */
-    border: none;                /* Supprimer la bordure par défaut */
-    border-radius: 5px;         /* Coins arrondis */
-    cursor: pointer;             /* Curseur en main au survol */
-    transition: background-color 0.3s; /* Transition pour le changement de couleur */
-}
-
-/* Couleurs des boutons */
-button.modifier-btn {
-    background-color: #28a745;   /* Couleur verte pour le bouton Modifier */
-}
-
-button.retirer-btn {
-    background-color: #dc3545;   /* Couleur rouge pour le bouton Retirer */
-}
-
-button.desactiver-btn {
-    background-color: rgb(135, 175, 235);   /* Couleur jaune pour le bouton Désactiver */
-}
-
-/* Styles au survol pour chaque bouton */
-button.modifier-btn:hover {
-    background-color: #218838;    /* Couleur verte plus foncée au survol */
-}
-
-button.retirer-btn:hover {
-    background-color: #c82333;    /* Couleur rouge plus foncée au survol */
-}
-
-button.desactiver-btn:hover {
-    background-color: rgb(42, 42, 248);    /* Couleur jaune plus foncée au survol */
-}
-
-/* Ajustement de la taille des boutons */
-button.modifier-btn,
-button.retirer-btn,
-button.desactiver-btn {
-    height: auto;                 /* Hauteur automatique pour ajuster au texte */
-    padding: 5px 10px;           /* Ajustement des espacements */
-}
 
 /* Navigation */
 nav {
@@ -286,3 +225,71 @@ padding-left: 5px;
 padding-right: 5px;
     border-bottom: 1px #d5d5d5 solid;
 }
+
+
+
+
+
+/* Bouton */
+button, .soumettre {
+    padding: 10px;
+    background-color: #007bff;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%; /* Bouton prend toute la largeur */
+    transition: background-color 0.3s; /* Transition pour le changement de couleur */
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Styles généraux pour les boutons personnalisés */
+button.modifier-btn,
+button.retirer-btn,
+button.desactiver-btn {
+    padding: 10px;               /* Espacement interne */
+    color: white;                /* Couleur du texte */
+    border: none;                /* Supprimer la bordure par défaut */
+    border-radius: 5px;         /* Coins arrondis */
+    cursor: pointer;             /* Curseur en main au survol */
+    transition: background-color 0.3s; /* Transition pour le changement de couleur */
+}
+
+/* Couleurs des boutons */
+button.modifier-btn {
+    background-color: #28a745;   /* Couleur verte pour le bouton Modifier */
+}
+
+button.retirer-btn {
+    background-color: #dc3545;   /* Couleur rouge pour le bouton Retirer */
+}
+
+button.desactiver-btn {
+    background-color: rgb(135, 175, 235);   /* Couleur jaune pour le bouton Désactiver */
+}
+
+/* Styles au survol pour chaque bouton */
+button.modifier-btn:hover {
+    background-color: #218838;    /* Couleur verte plus foncée au survol */
+}
+
+button.retirer-btn:hover {
+    background-color: #c82333;    /* Couleur rouge plus foncée au survol */
+}
+
+button.desactiver-btn:hover {
+    background-color: rgb(42, 42, 248);    /* Couleur jaune plus foncée au survol */
+}
+
+/* Ajustement de la taille des boutons */
+button.modifier-btn,
+button.retirer-btn,
+button.desactiver-btn {
+    height: auto;                 /* Hauteur automatique pour ajuster au texte */
+    padding: 5px 10px;           /* Ajustement des espacements */
+}
+

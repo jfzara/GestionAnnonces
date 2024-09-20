@@ -86,11 +86,14 @@ $result = $stmt->get_result();
             echo "<td>{$row['Prix']} $</td>";
             echo "<td>{$row['Parution']}</td>";
             echo "<td>{$row['Etat']}</td>";
-            // Chaque bouton dans sa propre cellule
-            echo "<td><button class='btn btn-success' onclick='modifyAnnouncement({$row['NoAnnonce']})'>Modifier</button></td>";
-            echo "<td><button class='btn btn-danger' onclick='confirmWithdrawal({$row['NoAnnonce']})'>Retirer</button></td>";
-            echo "<td><button class='btn btn-secondary toggle-btn' data-state='desactiver' onclick='toggleStatus(this)'>Désactiver</button></td>";
-            echo "</tr>";
+            // Chaque bouton dans sa propre cellule 
+            echo "<td><button style='background-color: #4caf50; color: white; border: none; padding: 10px; cursor: pointer;' onclick='modifyAnnouncement({$row['NoAnnonce']})'>Modifier</button></td>";
+
+echo "<td><button style='background-color: #f44336; color: white; border: none; padding: 10px; cursor: pointer;' onclick='confirmWithdrawal({$row['NoAnnonce']})'>Retirer</button></td>";
+
+echo "<td><button style='background-color: grey; color: white; border: none; padding: 10px; cursor: pointer;' data-state='desactiver' onclick='toggleStatus(this)'>Désactiver</button></td>";
+
+echo "</tr>";
         }
     } else {
         echo "<tr><td colspan='10' class='text-center'>Aucune annonce trouvée.</td></tr>";
